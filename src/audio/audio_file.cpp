@@ -7,7 +7,7 @@ AudioFile::AudioFile(std::string filePath) : _filePath(filePath) {
         _size = input.tellg();
         input.seekg (0, std::ios::beg);
     }
-};
+}
 
 AudioFile::~AudioFile() { if (input) { input.close(); }}
 

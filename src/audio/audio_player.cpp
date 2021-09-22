@@ -4,12 +4,12 @@
 #include <iostream>
 #include <algorithm>
 #include <cctype>
+#include <cstring>
 
 #include "portaudio.h"
 
 AudioPlayer::AudioPlayer() {
-    backend().setup(this, [](AudioPlayer* player, const void* input, void* output, unsigned long length) {
-        input;
+    backend().setup(this, [](AudioPlayer* player, [[maybe_unused]]const void* input, void* output, unsigned long length) {
         unsigned long bytesToRead = length * player->currentFile->channelsCount() * player->currentFile->sampleSize();
         memset(output, bytesToRead, 0);
         player->currentFile->readAudioChunkFromSample(player->currentSample, output, bytesToRead);
@@ -21,6 +21,7 @@ AudioPlayer::AudioPlayer() {
             } else {
                 player->stop();
             }
+            return true;
         } else {
             player->currentSample = nextSample;
         }
@@ -103,17 +104,23 @@ void AudioPlayer::openFolder(std::string folder) {
     activateFile();
 }
 
-void AudioPlayer::play() { 
-    _isPlaying = backend().open(currentFile);
+void AudioPlayer::play() {
+    if (currentFile != nullptr) {
+        _isPlaying = backend().open(currentFile);
+    } else if (hasFile()) {
+        activateFile();
+    }
 }
 
 void AudioPlayer::pause() { 
     _isPlaying = false; 
+    backend().close();
 }
 
 void AudioPlayer::stop() { 
-    _isPlaying = false; 
     currentSample = 0; 
+    _isPlaying = false; 
+    backend().close();
 }
 
 void AudioPlayer::jumpAt(double time) { 
@@ -126,7 +133,8 @@ bool AudioPlayer::hasNext() const {
     return hasFile() && (queueIndex + 1 < selectedFiles.size() || _isLooping); 
 }
 
-void AudioPlayer::next() { 
+void AudioPlayer::next() {
+    stop();
     if (hasNext()) { 
         currentSample = 0; 
         queueIndex = (queueIndex + 1) % selectedFiles.size(); 
@@ -139,6 +147,7 @@ bool AudioPlayer::hasPrevious() const {
 }
 
 void AudioPlayer::previous() { 
+    stop();
     if (hasPrevious()) { 
         currentSample = 0; 
         queueIndex = (queueIndex - 1) % selectedFiles.size(); 

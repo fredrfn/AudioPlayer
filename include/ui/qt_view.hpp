@@ -2,9 +2,9 @@
 #define QT_VIEW_HPP
 
 #include <QObject>
+#include <QWidget>
 #include <vector>
 
-class QWidget;
 class App;
 
 class QtView : public QObject {

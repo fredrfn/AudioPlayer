@@ -23,6 +23,8 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), periodicRefresher
     mainWidget = new QWidget;
     mainWidget->setLayout(mainLayout);
     setCentralWidget(mainWidget);
+
+    connect(this, SIGNAL(refresh()), this, SLOT(refreshAll()));
 }
 
 MainWindow::~MainWindow() {}
@@ -43,8 +45,6 @@ void MainWindow::setApp(App* application) {
 void MainWindow::periodicRefresh(MainWindow* context) {
     while(true) {
         std::this_thread::sleep_for(std::chrono::milliseconds(30));
-        if (context->isVisible()) {
-            context->refreshAll();
-        }
+        emit context->refresh();
     }
 }

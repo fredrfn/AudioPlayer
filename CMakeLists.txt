@@ -2,8 +2,12 @@
 cmake_minimum_required(VERSION 3.16)
 
 set(TARGET_NAME AudioPlayer)
-set(QT_MAJOR_VERSION 6)
-set(QT_HOME "C:/Qt/6.1.3/msvc2019_64")
+
+if(WIN32)
+    set(QT_HOME "C:/Qt/6.1.3/msvc2019_64")
+else()
+    set(QT_HOME "/home/frederic/Programs/Qt/6.1.0/gcc_64")
+endif()
 
 project(${TARGET_NAME} VERSION 0.0.1 DESCRIPTION "Project Description")
 
@@ -38,7 +42,7 @@ add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/portaudio)
 if(MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)
 else()
-    target_compile_options(${TARGET_NAME} PRIVATE -Wall -Wextra -pedantic -Werror)
+    target_compile_options(${TARGET_NAME} PRIVATE -Wextra -pedantic -Werror -Wno-error=unused-value -Wno-error=unused-parameter)
 endif()
 
 target_include_directories(${TARGET_NAME} PRIVATE ${Qt6_INCLUDE_DIRS})

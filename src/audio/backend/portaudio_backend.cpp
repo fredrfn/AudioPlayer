@@ -18,28 +18,17 @@ PortaudioBackend::~PortaudioBackend() {
 }
 
 bool PortaudioBackend::open(AudioFile* file) {
-    if (
-        currentFile != nullptr &&
-        currentFile->channelsCount() == file->channelsCount() &&
-        currentFile->sampleRate() == file->sampleRate() &&
-        currentFile->isSampleTypeFloat() == file->isSampleTypeFloat() &&
-        currentFile->sampleSize() == file->sampleSize()
-    ) {
-        currentFile = file;
-        return true;   
-    }
-
     close();
 
     PaStreamParameters outputParameters = {};
     outputParameters.device = Pa_GetDefaultOutputDevice();
-    outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultHighOutputLatency;
-    outputParameters.hostApiSpecificStreamInfo = nullptr;
-    
     if (outputParameters.device == paNoDevice) {
         std::cout << "PortaudioBackend: could not find a suitable device" << std::endl;
         return false;
     }
+
+    outputParameters.suggestedLatency = Pa_GetDeviceInfo(outputParameters.device)->defaultHighOutputLatency;
+    outputParameters.hostApiSpecificStreamInfo = nullptr;
 
 	outputParameters.channelCount = file->channelsCount();
     if (file->isSampleTypeFloat()) {
@@ -69,11 +58,10 @@ bool PortaudioBackend::open(AudioFile* file) {
 		[](
             const void *input, void *output,
             unsigned long frameCount,
-            const PaStreamCallbackTimeInfo* timeInfo,
-            PaStreamCallbackFlags statusFlags,
+            [[maybe_unused]] const PaStreamCallbackTimeInfo* timeInfo,
+            [[maybe_unused]] PaStreamCallbackFlags statusFlags,
             void *userData 
         ) {
-            statusFlags; timeInfo;
             PortaudioBackend* backend = reinterpret_cast<PortaudioBackend*>(userData);
             return (int)(backend->callback(backend->player, input, output, frameCount) ? paContinue : paComplete);
         }, 

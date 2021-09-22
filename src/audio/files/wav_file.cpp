@@ -1,5 +1,6 @@
 #include "audio/files/wav_file.hpp"
 #include <iostream>
+#include <cstring>
 
 // Source of the WAV spec: 
 // https://www.isip.piconepress.com/projects/speech/software/tutorials/production/fundamentals/v1.0/section_02/s02_01_p05.html

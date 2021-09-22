@@ -96,7 +96,6 @@ void ControlsView::refresh() {
     previousButton->setEnabled(app->audioPlayer().hasPrevious());
     playerSlider->setEnabled(app->audioPlayer().hasFile());
     volumeSlider->setValue(app->audioPlayer().volume() * 100);
-
     playerSlider->blockSignals(true);
     playerSlider->setValue(1000 * app->audioPlayer().progress());
     playerSlider->blockSignals(false);

@@ -13,9 +13,9 @@ typedef bool(*AudioBackendCallback)(
 
 class AudioBackend {
 protected:
-    AudioBackendCallback callback;
-    AudioPlayer* player;
-    AudioFile* currentFile;
+    AudioBackendCallback callback = nullptr;
+    AudioPlayer* player = nullptr;
+    AudioFile* currentFile = nullptr;
 public:
     void setup(AudioPlayer* p, AudioBackendCallback handler) { player = p; callback = handler; }
     virtual bool open(AudioFile* file) = 0;

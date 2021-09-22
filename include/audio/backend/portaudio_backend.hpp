@@ -5,7 +5,7 @@
 #include "portaudio.h"
 
 class PortaudioBackend : public AudioBackend {
-    PaStream* stream;
+    PaStream* stream = nullptr;
 public:
     PortaudioBackend();
     ~PortaudioBackend();

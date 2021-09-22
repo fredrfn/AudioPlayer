@@ -40,9 +40,7 @@ public:
     bool isValid() const;
     bool hasNextChunk() const;
     unsigned long long size() const;
-    virtual void readAudioChunkFromSample(unsigned long long sample, void* destination, unsigned int length) {
-        sample; destination; length;
-    }
+    virtual void readAudioChunkFromSample([[maybe_unused]] unsigned long long sample, [[maybe_unused]] void* destination, [[maybe_unused]] unsigned int length) {}
 };
 
 #endif
