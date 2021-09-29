@@ -24,10 +24,13 @@ add_executable(${TARGET_NAME}
     include/ui/qt_view.hpp
     include/ui/main_window.hpp
     include/ui/views/menu_view.hpp
+    src/sounds/sounds/files/mp3_file.cpp
     src/sounds/sounds/files/wav_file.cpp
     src/sounds/sound_file.cpp
     src/sounds/sound_player.cpp
     src/sounds/backends/portaudio_backend.cpp
+    src/sounds/music/pitch.cpp 
+    src/sounds/players/sound_files_player.cpp
     src/ui/views/menu_view.cpp
     src/ui/views/player_view.cpp
     src/ui/views/player/controls_view.cpp
@@ -38,6 +41,9 @@ add_executable(${TARGET_NAME}
 )
     
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/portaudio)
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib)
+
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/openmp3)
 target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib)
 
 if(MSVC)
@@ -51,7 +57,7 @@ target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 set_target_properties(${TARGET_NAME} PROPERTIES DEBUG_OUTPUT_NAME "${TARGET_NAME}d" RELEASE_OUTPUT_NAME ${TARGET_NAME})
 
 # Libraries
-target_link_libraries(${TARGET_NAME} PRIVATE Qt6::Widgets portaudio_static)
+target_link_libraries(${TARGET_NAME} PRIVATE Qt6::Widgets portaudio_static openmp3)
 
 # DLL copying
 add_custom_command(

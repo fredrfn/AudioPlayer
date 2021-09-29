@@ -1,15 +1,17 @@
 #ifndef SOUND_FILES_PLAYER_HPP
 #define SOUND_FILES_PLAYER_HPP
 
-#include "sounds/sounds/files/wav_file.hpp"
 #include "sounds/sound_player.hpp"
-#include <algorithm>
-#include <filesystem>
-#include <memory>
 #include <random>
-#include <iostream>
+#include <map>
+#include <memory>
+
+class SoundFile;
 
 // Class wrapping the SoundPlayer to provide easy sound files playback and enqueueing
+// To support a file extension:  you need to 
+// - create a ***File class, defining properly its constructor and getSamples methods 
+// - in the sound files player constructor, or externally, add to the supportedFormats map the desired format
 class SoundFilesPlayer {
     // Player
     std::unique_ptr<Sound> sound;
@@ -25,54 +27,17 @@ class SoundFilesPlayer {
     unsigned int queueIndex = 0;
     // Utilities
     std::random_device randomDevice;
-    void switchFile(unsigned int index) { 
-        stop();
-        queueIndex = index % queue.size();
-        sound.reset(buildSound(queue[queueIndex]));
-        if (sound != nullptr) {
-            player.reset(new SoundPlayer(*(sound.get()), processors, playCallbackContext, playCallback, playEndedCallback));
-        } else {
-            player.release();
-            sound.release();
-        }
-        play();
-    }
-    Sound* buildSound(const std::string& filePath) {
-        std::string extension = filePath.substr(filePath.size() - 3, 3);
-        for(int i = 0; i < 3; i++) { extension[i] = (char)std::tolower(extension[i]); }
-        std::shared_ptr<Sound> file;
-        if (extension == "wav") {
-            return new WAVFile(filePath);
-        } else {
-            std::cout << "Unsupported format: " << extension << std::endl;
-            return nullptr;
-        }   
-    }
-    void sortQueue() {
-        if (isEmpty()) { return; }
-        if (_isShuffling) {
-            auto& tmp = queue[0];
-            queue[0] = queue[queueIndex];
-            queue[queueIndex] = tmp;
-            queueIndex = 0;
-            std::shuffle(queue.begin() + 1, queue.end(), std::mt19937(randomDevice()));
-        } else {
-            sort(queue.begin(), queue.end());
-            auto result = std::find(queue.begin(), queue.end(), current());
-            queueIndex = (unsigned int)(result != queue.end() ? result - queue.begin() : 0);
-        }
-    }
+    void switchFile(unsigned int index);
+    Sound* buildSound(const std::string& filePath);
+    void sortQueue();
 public:
     SoundFilesPlayer(
         std::vector<SoundProcessor*> processors = {},
         void* playCallbackContext = nullptr,
         void (*playCallback)(void*) = nullptr,
         void (*playEndedCallback)(void*) = nullptr
-    ) : 
-        processors(processors), 
-        playCallbackContext(playCallbackContext), 
-        playCallback(playCallback),
-        playEndedCallback(playEndedCallback) {};
+    );
+    std::map<std::string, SoundFile*(*)(const std::string&)> supportedFiles;
     // Getters
     bool isPlaying() const { return player.get() != nullptr ? player.get()->isPlaying() : false; }
     double time() const { return player.get() != nullptr ? player.get()->time() : 0.0; }
@@ -93,35 +58,10 @@ public:
     void previous() { if (hasPrevious()) { switchFile(queueIndex - 1); } }
     void toggleShuffling() { _isShuffling = !_isShuffling; sortQueue(); }
     void toggleLoop() { _isLooping = !_isLooping; }
-    void openFile(std::string file) {
-        clear();
-        queue.emplace_back(file);
-        switchFile(0);
-    }
-    void openFiles(std::vector<std::string> files) {
-        clear();
-        queue = files;
-        switchFile(0);
-    }
-    void openFolder(std::string folder) {
-        clear();
-        for (auto &p : std::filesystem::recursive_directory_iterator(folder)) {
-            auto extension = p.path().extension();
-            if (extension == ".wav") {
-                queue.push_back(p.path().string());
-            }
-        }
-        switchFile(0);
-    }
-    void clear() {
-        if (player.get() != nullptr) {
-            player.get()->stop();
-        }
-        player.release(); 
-        sound.release(); 
-        queueIndex = 0; 
-        queue.clear();  
-    }
+    void openFile(std::string file);
+    void openFiles(std::vector<std::string> files);
+    void openFolder(std::string folder);
+    void clear();
 };
 
 #endif 

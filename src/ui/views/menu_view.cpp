@@ -130,12 +130,20 @@ void MenuView::about() {
 
 }
 
+QString MenuView::supportedFilesFormatString() {
+    std::string formats = "";
+    for (auto const& [extension, _] : app->audioPlayer.supportedFiles) {
+        formats += "*." + extension + " ";
+    }
+    return tr("Audio files") + QString::fromStdString(" (" + formats + ")");
+}
+
 void MenuView::open() {
     QString fileName = QFileDialog::getOpenFileName(
         this->fileMenu, 
         tr("Open Audio File"),
         "/home", 
-        tr("Audio files (*.wav)")
+        supportedFilesFormatString()
     );
     if (fileName.isEmpty() || fileName.isNull()) { return; }
     app->audioPlayer.openFile(fileName.toStdString());
@@ -147,7 +155,7 @@ void MenuView::openMultiple() {
         this->fileMenu, 
         tr("Open Audio Files"),
         "/home", 
-        tr("Audio files (*.wav)")
+        supportedFilesFormatString()
     );
     if(files.empty()) { return; }
 

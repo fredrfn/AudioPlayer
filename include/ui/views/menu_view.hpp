@@ -38,6 +38,7 @@ class MenuView : public QtView {
     QAction* chorusAction;
     QAction* tremoloAction;
     QAction* filteringAction;
+    QString supportedFilesFormatString();
 protected: 
     virtual void init();
 public:

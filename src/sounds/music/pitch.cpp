@@ -3,12 +3,12 @@
 #include <cmath>
 #include <regex>
 
-PitchData::PitchData(PitchClass pitchClass, Accidental accidental = Accidental::NONE, int octava = 4, Pitch a4Temperament = 440) : 
+PitchData::PitchData(PitchClass pitchClass, Accidental accidental, int octava, Pitch a4Temperament) : 
     _pitchClass(pitchClass), _octava(octava), _accidental(accidental), a4Temperament(a4Temperament) {
     computeFrequency();
 }
 
-PitchData::PitchData(const std::string& spn, Pitch a4Temperament = 440) : a4Temperament(a4Temperament) {
+PitchData::PitchData(const std::string& spn, Pitch a4Temperament) : a4Temperament(a4Temperament) {
     _pitchClass = PitchClass::A;
     _octava = 4;
     _accidental = Accidental::NONE;
@@ -74,7 +74,7 @@ char PitchData::pitchChar() const {
 
 std::string PitchData::alterationStr() const {
     auto value = accidentalValue();
-    return accidentalValue == 0 ? "" : std::string(abs(value), value < 0 ? 'b' : '#');
+    return accidentalValue() == 0 ? "" : std::string(abs(value), value < 0 ? 'b' : '#');
 }
 
 unsigned int PitchData::midiNoteOnIndex() const { 
