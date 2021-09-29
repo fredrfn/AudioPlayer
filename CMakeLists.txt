@@ -24,10 +24,10 @@ add_executable(${TARGET_NAME}
     include/ui/qt_view.hpp
     include/ui/main_window.hpp
     include/ui/views/menu_view.hpp
-    src/audio/files/wav_file.cpp
-    src/audio/audio_file.cpp
-    src/audio/audio_player.cpp
-    src/audio/backend/portaudio_backend.cpp
+    src/sounds/sounds/files/wav_file.cpp
+    src/sounds/sound_file.cpp
+    src/sounds/sound_player.cpp
+    src/sounds/backends/portaudio_backend.cpp
     src/ui/views/menu_view.cpp
     src/ui/views/player_view.cpp
     src/ui/views/player/controls_view.cpp
@@ -38,6 +38,7 @@ add_executable(${TARGET_NAME}
 )
     
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/lib/portaudio)
+target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/lib)
 
 if(MSVC)
     target_compile_options(${TARGET_NAME} PRIVATE /W4 /WX)

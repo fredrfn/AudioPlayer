@@ -119,11 +119,11 @@ void MenuView::init() {
 }
 
 void MenuView::refresh() {
-    playAction->setEnabled(app->audioPlayer().hasFile() && !app->audioPlayer().isPlaying());
-    pauseAction->setEnabled(app->audioPlayer().isPlaying());
-    stopAction->setEnabled(app->audioPlayer().hasFile());
-    nextAction->setEnabled(app->audioPlayer().hasNext());
-    previousAction->setEnabled(app->audioPlayer().hasPrevious());
+    playAction->setEnabled(!app->audioPlayer.isEmpty() && !app->audioPlayer.isPlaying());
+    pauseAction->setEnabled(app->audioPlayer.isPlaying());
+    stopAction->setEnabled(!app->audioPlayer.isEmpty());
+    nextAction->setEnabled(app->audioPlayer.hasNext());
+    previousAction->setEnabled(app->audioPlayer.hasPrevious());
 }
 
 void MenuView::about() {
@@ -135,10 +135,10 @@ void MenuView::open() {
         this->fileMenu, 
         tr("Open Audio File"),
         "/home", 
-        tr("Audio Files (*.wav)")
+        tr("Audio files (*.wav)")
     );
     if (fileName.isEmpty() || fileName.isNull()) { return; }
-    app->audioPlayer().openFile(fileName.toStdString());
+    app->audioPlayer.openFile(fileName.toStdString());
     app->ui().refreshAll();
 }
 
@@ -147,14 +147,14 @@ void MenuView::openMultiple() {
         this->fileMenu, 
         tr("Open Audio Files"),
         "/home", 
-        tr("Audio Files (*.wav)")
+        tr("Audio files (*.wav)")
     );
     if(files.empty()) { return; }
 
     std::vector<std::string> fileNames = {};
     for(auto& file : files) { fileNames.push_back(file.toStdString()); }
     
-    app->audioPlayer().openFiles(fileNames);
+    app->audioPlayer.openFiles(fileNames);
     app->ui().refreshAll();
 }
 
@@ -165,7 +165,7 @@ void MenuView::openFolder() {
         "/home"
     );
     if(!folder.isEmpty() && !folder.isNull()){
-        app->audioPlayer().openFolder(folder.toStdString());
+        app->audioPlayer.openFolder(folder.toStdString());
         app->ui().refreshAll();
     }
 }
@@ -175,54 +175,54 @@ void MenuView::exit() {
 }
 
 void MenuView::play() {
-    app->audioPlayer().play();
+    app->audioPlayer.play();
     app->ui().refreshAll();
 }
 
 void MenuView::pause() {
-    app->audioPlayer().pause();
+    app->audioPlayer.pause();
     app->ui().refreshAll();
 }
 
 void MenuView::stop() {
-    app->audioPlayer().stop();
+    app->audioPlayer.stop();
     app->ui().refreshAll();
 }
 
 void MenuView::next() {
-    app->audioPlayer().next();
+    app->audioPlayer.next();
     app->ui().refreshAll();
 }
 
 void MenuView::previous() {
-    app->audioPlayer().previous();
+    app->audioPlayer.previous();
     app->ui().refreshAll();
 }
 
 void MenuView::shuffle() {
-    app->audioPlayer().toggleShuffling();
+    app->audioPlayer.toggleShuffling();
     app->ui().refreshAll();
 }
 
 void MenuView::loop() {
-    app->audioPlayer().toggleLoop();
+    app->audioPlayer.toggleLoop();
     app->ui().refreshAll();
 }
 
 void MenuView::volumeUp() {
-    float volume = app->audioPlayer().volume();
-    app->audioPlayer().setVolume(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
+    float volume = app->amplifier.gain();
+    app->amplifier.gain(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
     app->ui().refreshAll();
 }
 
 void MenuView::volumeDown() {
-    float volume = app->audioPlayer().volume();
-    app->audioPlayer().setVolume(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
+    float volume = app->amplifier.gain();
+    app->amplifier.gain(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
     app->ui().refreshAll();
 }
 
 void MenuView::mute() {
-    app->audioPlayer().setVolume(0.0f);
+    app->amplifier.gain(0.0f);
     app->ui().refreshAll();
 }
 

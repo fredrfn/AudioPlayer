@@ -87,17 +87,17 @@ void ControlsView::init() {
 }
 
 void ControlsView::refresh() {
-    currentTimeLabel->setText(app->audioPlayer().hasFile() ? formatTime(round(app->audioPlayer().time())) : "--:--");
-    remainingTimeLabel->setText(app->audioPlayer().hasFile() ? formatTime(round(app->audioPlayer().duration() - app->audioPlayer().time())) : "--:--");
-    playButton->setEnabled(app->audioPlayer().hasFile() && !app->audioPlayer().isPlaying());
-    pauseButton->setEnabled(app->audioPlayer().isPlaying());
-    stopButton->setEnabled(app->audioPlayer().hasFile());
-    nextButton->setEnabled(app->audioPlayer().hasNext());
-    previousButton->setEnabled(app->audioPlayer().hasPrevious());
-    playerSlider->setEnabled(app->audioPlayer().hasFile());
-    volumeSlider->setValue(app->audioPlayer().volume() * 100);
+    currentTimeLabel->setText(!app->audioPlayer.isEmpty() ? formatTime(round(app->audioPlayer.time())) : "--:--");
+    remainingTimeLabel->setText(!app->audioPlayer.isEmpty() ? formatTime(round(app->audioPlayer.duration() - app->audioPlayer.time())) : "--:--");
+    playButton->setEnabled(!app->audioPlayer.isEmpty() && !app->audioPlayer.isPlaying());
+    pauseButton->setEnabled(app->audioPlayer.isPlaying());
+    stopButton->setEnabled(!app->audioPlayer.isEmpty());
+    nextButton->setEnabled(app->audioPlayer.hasNext());
+    previousButton->setEnabled(app->audioPlayer.hasPrevious());
+    playerSlider->setEnabled(!app->audioPlayer.isEmpty());
+    volumeSlider->setValue(app->amplifier.gain() * 100);
     playerSlider->blockSignals(true);
-    playerSlider->setValue(1000 * app->audioPlayer().progress());
+    playerSlider->setValue(1000 * app->audioPlayer.progress());
     playerSlider->blockSignals(false);
 }
 
@@ -130,58 +130,58 @@ QString ControlsView::formatTime(double timeInSeconds) {
 }
 
 void ControlsView::play() {
-    app->audioPlayer().play();
+    app->audioPlayer.play();
     app->ui().refreshAll();
 }
 
 void ControlsView::pause() {
-    app->audioPlayer().pause();
+    app->audioPlayer.pause();
     app->ui().refreshAll();
 }
 
 void ControlsView::stop() {
-    app->audioPlayer().stop();
+    app->audioPlayer.stop();
     app->ui().refreshAll();
 }
 
 void ControlsView::next() {
-    app->audioPlayer().next();
+    app->audioPlayer.next();
     app->ui().refreshAll();
 }
 
 void ControlsView::previous() {
-    app->audioPlayer().previous();
+    app->audioPlayer.previous();
     app->ui().refreshAll();
 }
 
 void ControlsView::shuffle() {
-    app->audioPlayer().toggleShuffling();
+    app->audioPlayer.toggleShuffling();
     app->ui().refreshAll();
 }
 
 void ControlsView::loop() {
-    app->audioPlayer().toggleLoop();
+    app->audioPlayer.toggleLoop();
     app->ui().refreshAll();
 }
 
 void ControlsView::volumeUp() {
-    float volume = app->audioPlayer().volume();
-    app->audioPlayer().setVolume(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
+    float volume = app->amplifier.gain();
+    app->amplifier.gain(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
     app->ui().refreshAll();
 }
 
 void ControlsView::volumeDown() {
-    float volume = app->audioPlayer().volume();
-    app->audioPlayer().setVolume(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
+    float volume = app->amplifier.gain();
+    app->amplifier.gain(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
     app->ui().refreshAll();
 }
 
 void ControlsView::setVolume(int progress) {
-    app->audioPlayer().setVolume((float)progress / 100.0f);
+    app->amplifier.gain((float)progress / 100.0f);
     app->ui().refreshAll();
 }
 
 void ControlsView::jumpAt(int progress) {
-    app->audioPlayer().jumpAt(app->audioPlayer().duration() * (float)progress / 1000.0f);
+    app->audioPlayer.jumpAt(app->audioPlayer.duration() * (float)progress / 1000.0f);
     app->ui().refreshAll();
 }

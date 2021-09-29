@@ -5,7 +5,6 @@
 #include "ui/qt_view.hpp"
 #include "ui/views/menu_view.hpp"
 #include "ui/views/player_view.hpp"
-#include <QThread>
 #include <thread>
 
 class QWidget;
@@ -21,14 +20,12 @@ class MainWindow : public QMainWindow {
     PlayerView playerView;
     MenuView menuView; 
     App* app;  
-    std::thread periodicRefresher;
 public slots:
     void refreshAll();
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
     void setApp(App* application);
-    static void periodicRefresh(MainWindow* context);
 signals:    
     void refresh();
 };

@@ -3,12 +3,11 @@
 #include <QLayout>
 #include <QLayoutItem>
 #include <QMenuBar>
-#include "audio/audio_player.hpp"
 #include "app.hpp"
 
 #include <vector>
 
-MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), periodicRefresher(MainWindow::periodicRefresh, this) {
+MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle(tr("AudioPlayer"));
     resize(500, 100);
     setMinimumSize(500, 100);
@@ -30,7 +29,7 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), periodicRefresher
 MainWindow::~MainWindow() {}
 
 void MainWindow::refreshAll() {
-    setWindowTitle(tr("AudioPlayer") + QString::fromStdString(app->audioPlayer().hasFile() ? " - " + app->audioPlayer().currentFilePath() : ""));
+    setWindowTitle(tr("AudioPlayer") + QString::fromStdString(!app->audioPlayer.isEmpty() ? " - " + app->audioPlayer.current() : ""));
     menuView.refreshAll();
     playerView.refreshAll();
 }
@@ -39,12 +38,5 @@ void MainWindow::setApp(App* application) {
     app = application;
     for (QtView* view : std::vector<QtView*>({&menuView, &playerView})) {
         view->setApp(application);
-    }
-}
-
-void MainWindow::periodicRefresh(MainWindow* context) {
-    while(true) {
-        std::this_thread::sleep_for(std::chrono::milliseconds(30));
-        emit context->refresh();
     }
 }
