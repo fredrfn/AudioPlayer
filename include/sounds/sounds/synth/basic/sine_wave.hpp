@@ -24,10 +24,12 @@ public:
     float amplitude() { return _amplitude; }
     float phaseOffset() { return _phaseOffset; }
     virtual void getSamples(SampleCount at, SoundBuffer& buffer) override {
+        if (samplingRate() == 0) { return; }
         for(SampleCount sample = 0; sample < buffer.channelLength(); sample++) {
-            float value = sinf(2 * M_PI * _pitch * (_phaseOffset + at + sample));
+            float time = (_phaseOffset + at + sample) / samplingRate();
+            float value = amplitude() * sinf(2 * (float)M_PI * _pitch * time);
             for(ChannelsCount channel = 0; channel < channelsCount(); channel++) {
-                buffer.write(channel, sample, value);
+                buffer.write(sample, channel, value);
             }
         }
     }

@@ -3,6 +3,7 @@
 #include <QMenuBar>
 #include "app.hpp"
 #include <QFileDialog>
+#include <QMessageBox>
 
 void MenuView::init() {
     menubar = new QMenuBar;
@@ -54,33 +55,6 @@ void MenuView::init() {
     aboutAction = new QAction(tr("&About"), this);
     connect(aboutAction, &QAction::triggered, this, &MenuView::about);
 
-    equalizationAction = new QAction(tr("&Equalization"), this);
-    connect(equalizationAction, &QAction::triggered, this, &MenuView::equalization);
-
-    phasingAction = new QAction(tr("&Phasing"), this);
-    connect(phasingAction, &QAction::triggered, this, &MenuView::phasing);
-
-    flangingAction = new QAction(tr("&Flanging"), this);
-    connect(flangingAction, &QAction::triggered, this, &MenuView::flanging);
-
-    panningAction = new QAction(tr("&Panning"), this);
-    connect(panningAction, &QAction::triggered, this, &MenuView::panning);
-
-    delayAction = new QAction(tr("&Delay"), this);
-    connect(delayAction, &QAction::triggered, this, &MenuView::delay);
-
-    reverbAction = new QAction(tr("&Reverb"), this);
-    connect(reverbAction, &QAction::triggered, this, &MenuView::reverb);
-
-    chorusAction = new QAction(tr("&Chorus"), this);
-    connect(chorusAction, &QAction::triggered, this, &MenuView::chorus);
-
-    tremoloAction = new QAction(tr("&Tremolo"), this);
-    connect(tremoloAction, &QAction::triggered, this, &MenuView::tremolo);
-
-    filteringAction = new QAction(tr("&Filtering"), this);
-    connect(filteringAction, &QAction::triggered, this, &MenuView::filtering);
-
     fileMenu = menubar->addMenu(tr("&File"));
     fileMenu->addAction(openAction);
     fileMenu->addAction(openMultipleAction);
@@ -93,8 +67,7 @@ void MenuView::init() {
     playbackMenu->addAction(pauseAction);
     playbackMenu->addAction(stopAction);
     playbackMenu->addSeparator();
-    playbackMenu->addAction(volumeUpAction);
-    playbackMenu->addAction(volumeDownAction);
+
     playbackMenu->addAction(shuffleAction);
     playbackMenu->addAction(loopAction);
     playbackMenu->addSeparator();
@@ -102,15 +75,9 @@ void MenuView::init() {
     playbackMenu->addAction(nextAction);
 
     audioMenu = menubar->addMenu(tr("&Audio"));
-    audioMenu->addAction(equalizationAction);
-    audioMenu->addAction(phasingAction);
-    audioMenu->addAction(flangingAction);
-    audioMenu->addAction(panningAction);
-    audioMenu->addAction(delayAction);
-    audioMenu->addAction(reverbAction);
-    audioMenu->addAction(chorusAction);
-    audioMenu->addAction(tremoloAction);
-    audioMenu->addAction(filteringAction);
+    audioMenu->addAction(volumeUpAction);
+    audioMenu->addAction(volumeDownAction);
+    audioMenu->addAction(muteAction);
 
     helpMenu = menubar->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAction);
@@ -127,7 +94,24 @@ void MenuView::refresh() {
 }
 
 void MenuView::about() {
+    QMessageBox msgBox;
+    msgBox.setWindowTitle(tr("About AudioPlayer"));
+    msgBox.setText(R"(
+The AudioPlayer is a hobby project featuring:
+    - WAV / MP3 playback
+    - Files enqueing
+    - Sound amplification
+    - Basic sound effects
 
+Built for pedagogical purposes, IT IS NOT MEANT TO REPLACE VLC or any available media player.
+Its simplicity aims to show how to create an audio player, with basic audio processing.
+Depends on PortAudio, OpenMP3 and Qt libraries.
+
+Code source available at: https://github.com/fredrfn/AudioPlayer
+
+Contact: fred.rouffineau@gmail.com
+)");
+    msgBox.exec();
 }
 
 QString MenuView::supportedFilesFormatString() {
@@ -232,40 +216,4 @@ void MenuView::volumeDown() {
 void MenuView::mute() {
     app->amplifier.gain(0.0f);
     app->ui().refreshAll();
-}
-
-void MenuView::equalization() {
-
-}
-
-void MenuView::phasing() {
-
-}
-
-void MenuView::flanging() {
-
-}
-
-void MenuView::panning() {
-
-}
-
-void MenuView::delay() {
-
-}
-
-void MenuView::reverb() {
-
-}
-
-void MenuView::chorus() {
-
-}
-
-void MenuView::tremolo() {
-
-}
-
-void MenuView::filtering() {
-
 }

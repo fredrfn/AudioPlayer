@@ -39,7 +39,7 @@ public:
         int octava = 4, 
         Pitch a4Temperament = 440
     );
-    PitchData(const std::string& spn, Pitch a4Temperament = 440);
+    PitchData(std::string spn, Pitch a4Temperament = 440);
     std::string toString() const;
     char pitchChar() const;
     std::string alterationStr() const;

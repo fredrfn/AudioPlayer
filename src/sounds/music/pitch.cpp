@@ -1,14 +1,17 @@
 #include "sounds/music/pitch.hpp"
 
+#define PITCH_SEMITONE_FACTOR 1.05946309436
+
 #include <cmath>
 #include <regex>
+#include <iostream>
 
 PitchData::PitchData(PitchClass pitchClass, Accidental accidental, int octava, Pitch a4Temperament) : 
     _pitchClass(pitchClass), _octava(octava), _accidental(accidental), a4Temperament(a4Temperament) {
     computeFrequency();
 }
 
-PitchData::PitchData(const std::string& spn, Pitch a4Temperament) : a4Temperament(a4Temperament) {
+PitchData::PitchData(std::string spn, Pitch a4Temperament) : a4Temperament(a4Temperament) {
     _pitchClass = PitchClass::A;
     _octava = 4;
     _accidental = Accidental::NONE;
@@ -18,10 +21,10 @@ PitchData::PitchData(const std::string& spn, Pitch a4Temperament) : a4Temperamen
     std::smatch matches;
 
     if (std::regex_match(spn, matches, spnRegex)) {
-        for (size_t i = 0; i < matches.size(); ++i) {
+        for (size_t i = 1; i < matches.size(); ++i) {
             std::ssub_match sub_match = matches[i];
             std::string match = sub_match.str();
-            switch (i) {
+            switch (i - 1) {
                 case 0: {
                     switch(match[0]) {
                         case 'A': _pitchClass = PitchClass::A; break;
@@ -56,12 +59,15 @@ PitchData::PitchData(const std::string& spn, Pitch a4Temperament) : a4Temperamen
                 default: break;
             }
         }   
+    } else {
+        std::cout << "Pitch SPN did not match regex!" << std::endl;
     }
     computeFrequency();
 }
 
 void PitchData::computeFrequency() { 
-    _frequency = a4Temperament * powf(2.0f, midiNoteOnIndex() - A4_MIDI_NOTE_ON/12.0f); 
+    int exponent = midiNoteOnIndex() - 69;
+    _frequency = a4Temperament * (float)pow(PITCH_SEMITONE_FACTOR, exponent); 
 }
 
 std::string PitchData::toString() const { 

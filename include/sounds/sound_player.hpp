@@ -27,7 +27,7 @@ public:
         void (*playEndedCallback)(void*) = nullptr
     );
     bool isPlaying() const { return _isPlaying; }
-    double time() const { return duration() * progress(); }
+    double time() const { return sound.samplingRate() > 0 ? currentSample / sound.samplingRate() : 0.0; }
     float progress() const { return sound.sampleCount() > 0 ? (float)currentSample / sound.sampleCount() : 0.0f; }
     double duration() const { return sound.duration(); }
     void play() { _isPlaying = true; backend().open(sound.channelsCount(), sound.samplingRate()); }

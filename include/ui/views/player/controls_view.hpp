@@ -20,7 +20,6 @@ class ControlsView : public QtView {
 
     QHBoxLayout* buttonsLayout;
     QPushButton* playButton;
-    QPushButton* pauseButton;
     QPushButton* stopButton;
     QPushButton* previousButton;
     QPushButton* nextButton;
@@ -31,13 +30,13 @@ class ControlsView : public QtView {
     QSlider* volumeSlider;
 
     QPushButton* setupControlButton(QString icon);
+    QString buttonStylesheet(bool active = false);
 protected: 
     virtual void init();
 public:
     virtual void refresh();
 private slots:
-    void play();
-    void pause();
+    void togglePlay();
     void stop();
     void next();
     void previous();

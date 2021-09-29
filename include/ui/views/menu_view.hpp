@@ -29,15 +29,6 @@ class MenuView : public QtView {
     QAction* volumeUpAction;
     QAction* volumeDownAction;
     QAction* muteAction;
-    QAction* equalizationAction;
-    QAction* phasingAction;
-    QAction* flangingAction;
-    QAction* panningAction;
-    QAction* delayAction;
-    QAction* reverbAction;
-    QAction* chorusAction;
-    QAction* tremoloAction;
-    QAction* filteringAction;
     QString supportedFilesFormatString();
 protected: 
     virtual void init();
@@ -59,15 +50,6 @@ private slots:
     void volumeUp();
     void volumeDown();
     void mute();
-    void equalization();
-    void phasing();
-    void flanging();
-    void panning();
-    void delay();
-    void reverb();
-    void chorus();
-    void tremolo();
-    void filtering();
 };
 
 #endif 

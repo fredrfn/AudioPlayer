@@ -10,6 +10,7 @@
 #include <QLabel>
 #include "app.hpp"
 #include <cmath>
+#include <string>
 
 void ControlsView::init() {
     root = new QWidget;
@@ -44,10 +45,7 @@ void ControlsView::init() {
     buttonsLayout = new QHBoxLayout;
 
     playButton = setupControlButton("assets/icons/play3.png");
-    connect(playButton, &QPushButton::clicked, this, &ControlsView::play);
-
-    pauseButton = setupControlButton("assets/icons/pause2.png");
-    connect(pauseButton, &QPushButton::clicked, this, &ControlsView::pause);
+    connect(playButton, &QPushButton::clicked, this, &ControlsView::togglePlay);
 
     stopButton = setupControlButton("assets/icons/stop2.png");
     connect(stopButton, &QPushButton::clicked, this, &ControlsView::stop);
@@ -89,11 +87,18 @@ void ControlsView::init() {
 void ControlsView::refresh() {
     currentTimeLabel->setText(!app->audioPlayer.isEmpty() ? formatTime(round(app->audioPlayer.time())) : "--:--");
     remainingTimeLabel->setText(!app->audioPlayer.isEmpty() ? formatTime(round(app->audioPlayer.duration() - app->audioPlayer.time())) : "--:--");
-    playButton->setEnabled(!app->audioPlayer.isEmpty() && !app->audioPlayer.isPlaying());
-    pauseButton->setEnabled(app->audioPlayer.isPlaying());
+    playButton->setEnabled(!app->audioPlayer.isEmpty());
+    if (app->audioPlayer.isPlaying()) {
+        playButton->setIcon(QIcon("assets/icons/pause2.png")); 
+    } else {
+        playButton->setIcon(QIcon("assets/icons/play3.png")); 
+    }
+    playButton->setStyleSheet(buttonStylesheet(app->audioPlayer.isPlaying()));
     stopButton->setEnabled(!app->audioPlayer.isEmpty());
     nextButton->setEnabled(app->audioPlayer.hasNext());
     previousButton->setEnabled(app->audioPlayer.hasPrevious());
+    loopButton->setStyleSheet(buttonStylesheet(app->audioPlayer.isLooping()));
+    shuffleButton->setStyleSheet(buttonStylesheet(app->audioPlayer.isShuffling()));
     playerSlider->setEnabled(!app->audioPlayer.isEmpty());
     volumeSlider->setValue(app->amplifier.gain() * 100);
     playerSlider->blockSignals(true);
@@ -101,23 +106,28 @@ void ControlsView::refresh() {
     playerSlider->blockSignals(false);
 }
 
-QPushButton* ControlsView::setupControlButton(QString icon) {
-    auto btn = new QPushButton;
-    btn->setFixedSize(QSize(32, 32));
-    btn->setIcon(QIcon(icon));
-    btn->setIconSize(QSize(16, 16));
-    btn->setStyleSheet(R"(
+QString ControlsView::buttonStylesheet(bool active) {
+    QString borderColor = active ? "#996655" : "#CCCCCC";
+    return R"(
         QPushButton {
             border-style: outset; 
             border-width: 2px; 
-            border-color: #CCCCCC
+            border-color:)" + borderColor + R"(;
         }
         QPushButton:disabled {
             background-color: #BBB;
             border-color: #EEEEEE;
             opacity: 0.5;
         }
-    )");
+    )";
+}
+
+QPushButton* ControlsView::setupControlButton(QString icon) {
+    auto btn = new QPushButton;
+    btn->setFixedSize(QSize(32, 32));
+    btn->setIcon(QIcon(icon));
+    btn->setIconSize(QSize(16, 16));
+    btn->setStyleSheet(buttonStylesheet(false));
     buttonsLayout->addWidget(btn);
     return btn;
 }
@@ -129,13 +139,12 @@ QString ControlsView::formatTime(double timeInSeconds) {
     return QString::fromStdString(minutes) + ":" + QString::fromStdString(secondsString);
 }
 
-void ControlsView::play() {
-    app->audioPlayer.play();
-    app->ui().refreshAll();
-}
-
-void ControlsView::pause() {
-    app->audioPlayer.pause();
+void ControlsView::togglePlay() {
+    if (app->audioPlayer.isPlaying()) {
+        app->audioPlayer.pause();
+    } else {
+        app->audioPlayer.play();
+    }
     app->ui().refreshAll();
 }
 
