@@ -4,7 +4,10 @@
 struct Complex {
     double real;
     double imaginary;
-    Complex(double real = 0.0, double imaginary = 0.0);
+    Complex() : real(0.0), imaginary(0.0) {}
+    explicit Complex(double real) : real(real), imaginary(0.0) {}
+    explicit Complex(float real) : real(real), imaginary(0.0) {}
+    Complex(double real, double imaginary);
     double modulus() const;
     double modulusSquared() const;
     double argument() const;

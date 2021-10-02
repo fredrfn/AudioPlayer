@@ -10,7 +10,7 @@ class QWidget;
 class QtView : public QObject {
     Q_OBJECT
 protected:
-    App* app;
+    App* app = nullptr;
     QWidget* root = nullptr;
     QtView* parent = nullptr;
     virtual void init() = 0; // responsible for setup/allocating widgets/children

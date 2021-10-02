@@ -104,6 +104,13 @@ double FourierSeriesAmplitudePhase::evaluate(double t) const {
  *  https://www.ti.com/lit/an/spra291/spra291.pdf
  **/
 
+std::vector<Complex> fft(const std::vector<float>& input) {
+    std::vector<Complex> complex;
+    complex.reserve(input.size());
+    for (float value : input) { complex.emplace_back(value); }
+    return fft(complex);
+}
+
 std::vector<Complex> fft(const std::vector<Complex>& input, bool isLengthPowerOfTwo) {
     if (input.size() < 2) {
         return input;
@@ -125,7 +132,7 @@ std::vector<Complex> fft(const std::vector<Complex>& input, bool isLengthPowerOf
     std::vector<Complex> output;
     std::vector<Complex> evens;
     std::vector<Complex> odds;
-    output.reserve(N);
+    output.resize(N);
     evens.reserve(N/2);
     odds.reserve(N/2);
     for (unsigned long j = 0; j < N; j++) {

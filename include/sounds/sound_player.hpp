@@ -31,10 +31,9 @@ public:
         void (*playEndedCallback)(void*) = nullptr
     );
     ~SoundPlayer() { wait(); }
-    void wait() { 
-        destroyMutex.lock();
-        destroyMutex.unlock();
-    }
+    void lock() { destroyMutex.lock(); }
+    void unlock() { destroyMutex.unlock(); }
+    void wait() { lock(); unlock(); }
     bool isPlaying() const { return _isPlaying; }
     double time() const { return sound.samplingRate() > 0 ? currentSample / sound.samplingRate() : 0.0; }
     float progress() const { return sound.sampleCount() > 0 ? (float)currentSample / sound.sampleCount() : 0.0f; }

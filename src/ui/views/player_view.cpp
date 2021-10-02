@@ -1,11 +1,12 @@
 #include "ui/views/player_view.hpp"
+#include "ui/stylesheets.hpp"
 
 #include <QSplitter>
 #include <QVBoxLayout>
 
 void PlayerView::init(){
-    root = new QSplitter(parent->widget(parent));
-    ((QSplitter*)root)->setOrientation(Qt::Vertical);
+    root = new QSplitter(Qt::Vertical, parent->widget(parent));
+    root->setStyleSheet(QString::fromStdString(Stylesheets::splitter()));
 
     controlEffectsLayout = new QVBoxLayout(root);
     controlEffectsLayout->setContentsMargins(0, 0, 0, 0);

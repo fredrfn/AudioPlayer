@@ -1,4 +1,5 @@
 #include "ui/views/player/controls_view.hpp"
+#include "ui/helpers/strings_helper.hpp"
 
 #include <QWidget>
 #include <QHBoxLayout>
@@ -148,10 +149,7 @@ QPushButton* ControlsView::setupControlButton(QString icon) {
 }
 
 QString ControlsView::formatTime(double timeInSeconds) {
-    std::string minutes = std::to_string((int)(timeInSeconds / 60));
-    int seconds = (int)(timeInSeconds) % 60;
-    std::string secondsString = seconds < 10 ? "0" + std::to_string(seconds) : std::to_string(seconds);
-    return QString::fromStdString(minutes) + ":" + QString::fromStdString(secondsString);
+    return QString::fromStdString(StringsHelper::formatTime(timeInSeconds));
 }
 
 void ControlsView::togglePlay() {

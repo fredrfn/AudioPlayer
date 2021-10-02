@@ -25,6 +25,7 @@ add_executable(${TARGET_NAME}
     include/ui/qt_view.hpp
     include/ui/main_view.hpp
     include/ui/views/menu_view.hpp
+    include/ui/views/player/visualizers_view.hpp
     # Sources list
     src/sounds/backends/portaudio_backend.cpp
     src/sounds/maths/complex.cpp
@@ -43,11 +44,11 @@ add_executable(${TARGET_NAME}
     src/sounds/sounds/synth/basic/sine_wave.cpp
     src/sounds/sound_file.cpp
     src/sounds/sound_player.cpp
+    src/ui/helpers/strings_helper.cpp
     src/ui/views/player/effects/echo_view.cpp
     src/ui/views/player/effects/equalizer_view.cpp
-    src/ui/views/player/visualizers/frequency_spectrum.cpp
-    src/ui/views/player/visualizers/phases_spectrum.cpp
-    src/ui/views/player/visualizers/signal_wave.cpp
+    src/ui/views/player/visualizers/spectrum_view.cpp
+    src/ui/views/player/visualizers/temporal_signal_view.cpp
     src/ui/views/player/controls_view.cpp
     src/ui/views/player/effects_view.cpp
     src/ui/views/player/visualizers_view.cpp
@@ -78,7 +79,9 @@ target_include_directories(${TARGET_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/include)
 set_target_properties(${TARGET_NAME} PROPERTIES DEBUG_OUTPUT_NAME "${TARGET_NAME}d" RELEASE_OUTPUT_NAME ${TARGET_NAME})
 
 # Libraries
-target_link_libraries(${TARGET_NAME} PRIVATE Qt6::Widgets portaudio_static openmp3)
+find_package(Qt6Charts)
+
+target_link_libraries(${TARGET_NAME} PRIVATE Qt6::Widgets Qt6::Charts portaudio_static openmp3)
 
 # DLL copying
 add_custom_command(
@@ -87,6 +90,9 @@ add_custom_command(
         $<TARGET_FILE:Qt6::Core>
         $<TARGET_FILE:Qt6::Gui>
         $<TARGET_FILE:Qt6::Widgets>
+        $<TARGET_FILE:Qt6::OpenGL>
+        $<TARGET_FILE:Qt6::OpenGLWidgets>
+        $<TARGET_FILE:Qt6::Charts>
         $<TARGET_FILE_DIR:${TARGET_NAME}>
 )
 add_custom_command(

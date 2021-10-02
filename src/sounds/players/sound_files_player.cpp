@@ -28,7 +28,7 @@ void SoundFilesPlayer::switchFile(unsigned int index) {
     if (player != nullptr) {
         player.get()->wait();
     }
-    Sound* result = buildSound(queue[queueIndex]);
+    SoundFile* result = buildSound(queue[queueIndex]);
     if (result != nullptr) {
         player.reset(new SoundPlayer(*result, processors, playCallbackContext, playCallback, playEndedCallback));
         sound.reset(result);
@@ -44,7 +44,7 @@ void SoundFilesPlayer::switchFile(unsigned int index) {
     }
 }
 
-Sound* SoundFilesPlayer::buildSound(const std::string& filePath) {
+SoundFile* SoundFilesPlayer::buildSound(const std::string& filePath) {
     std::string extension = filePath.substr(filePath.size() - 3, 3);
     for(int i = 0; i < 3; i++) { extension[i] = (char)std::tolower(extension[i]); }
     auto it = supportedFiles.find(extension);

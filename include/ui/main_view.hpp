@@ -6,23 +6,25 @@
 #include "ui/views/menu_view.hpp"
 #include "ui/views/player_view.hpp"
 #include "ui/views/sidebar_view.hpp"
+#include "sounds/sound_buffer.hpp"
 #include <thread>
 
 class QWidget;
 class QVBoxLayout;
 class App;
 class QSplitter;
+class MainView;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
-    QtView* view;
+    MainView* view;
 public slots:
-    void refreshAll() { view->refreshAll(); }
+    void refreshAll(SoundBuffer);
 public:
     explicit MainWindow(QWidget *parent = nullptr);
-    void setView(QtView* v) { view = v; };
+    void setView(MainView* v) { view = v; };
 signals:    
-    void refresh();
+    void refresh(SoundBuffer);
 };
 
 class MainView : public QtView {
@@ -37,6 +39,7 @@ public:
     MainView() { mainWindow.setView(this); widget(nullptr); }
     MainWindow mainWindow;
     virtual std::vector<QtView*> children() override { return { &menu, &sidebar, &player }; }
+    void processAudioEvent(SoundBuffer buffer);
 };
 
 #endif

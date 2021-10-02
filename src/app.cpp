@@ -7,10 +7,13 @@ App::App(QApplication& app) :
         _processors.all(), 
         this, 
         [](void* context, [[maybe_unused]]const SoundBuffer& buffer) { 
-            emit (reinterpret_cast<App*>(context))->ui().mainWindow.refresh();
+            auto a = reinterpret_cast<App*>(context);
+            emit a->ui().mainWindow.refresh(buffer);
         },
         [](void* context) { emit (reinterpret_cast<App*>(context))->audioPlayer().next(); }
-    ) 
+    ),
+    audioCallback(nullptr),
+    audioCallbackContext(nullptr)
 {
     processors().disableAll();
     processors().amplifier().enable();

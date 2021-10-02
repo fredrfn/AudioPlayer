@@ -5,15 +5,15 @@
 #include <QMenuBar>
 #include <QSplitter>
 #include "app.hpp"
+#include "ui/stylesheets.hpp"
 
 #include <vector>
 
 void MainView::init() {
     root = new QWidget(&mainWindow);
     
-
-
-    splitter = new QSplitter(root);
+    splitter = new QSplitter(Qt::Horizontal, root);
+    splitter->setStyleSheet(QString::fromStdString(Stylesheets::splitter()));
     splitter->addWidget(sidebar.widget(this));
     splitter->addWidget(player.widget(this));
 
@@ -33,7 +33,18 @@ void MainView::refresh() {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle(tr("AudioPlayer"));
-    resize(800, 600);
-    setMinimumSize(800, 600);
-    connect(this, SIGNAL(refresh()), this, SLOT(refreshAll()));
+    resize(800, 400);
+    setMinimumSize(800, 400);
+    connect(this, SIGNAL(refresh(SoundBuffer)), this, SLOT(refreshAll(SoundBuffer)));
+}
+
+void MainWindow::refreshAll(SoundBuffer buffer) {
+    view->processAudioEvent(buffer);
+    view->refreshAll(); 
+}
+
+void MainView::processAudioEvent(SoundBuffer buffer){
+    if (app->audioCallback != nullptr) {
+        app->audioCallback(app->audioCallbackContext, buffer);
+    }
 }

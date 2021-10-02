@@ -2,6 +2,8 @@
 #define SOUND_FILES_PLAYER_HPP
 
 #include "sounds/sound_player.hpp"
+#include "sounds/sound_file.hpp"
+
 #include <random>
 #include <map>
 #include <memory>
@@ -14,7 +16,7 @@ class SoundFile;
 // - in the sound files player constructor, or externally, add to the supportedFormats map the desired format
 class SoundFilesPlayer {
     // Player
-    std::unique_ptr<Sound> sound;
+    std::unique_ptr<SoundFile> sound;
     std::unique_ptr<SoundPlayer> player;
     std::vector<SoundProcessor*> processors;
     void* playCallbackContext = nullptr;
@@ -28,7 +30,7 @@ class SoundFilesPlayer {
     // Utilities
     std::random_device randomDevice;
     void switchFile(unsigned int index);
-    Sound* buildSound(const std::string& filePath);
+    SoundFile* buildSound(const std::string& filePath);
     void sortQueue(bool ignoreCurrent = false);
 public:
     SoundFilesPlayer(
@@ -43,12 +45,19 @@ public:
     double time() const { return player.get() != nullptr ? player.get()->time() : 0.0; }
     float progress() const { return player.get() != nullptr ? player.get()->progress() : 0.0f; }
     double duration() { return player.get() != nullptr ? player.get()->duration() : 0.0; }
+    unsigned long long size() { return sound.get() != nullptr ? sound.get()->size() : 0; }
+    ChannelsCount channels() { return sound.get() != nullptr ? sound.get()->channelsCount() : 0; }
+    SamplingRate samplingRate() { return sound.get() != nullptr ? sound.get()->samplingRate() : 0; }
+    SampleCount sampleCount() { return sound.get() != nullptr ? sound.get()->sampleCount() : 0; }
+    void getSamples(SampleCount at, SoundBuffer& buffer) { if(sound.get() != nullptr) {
+        sound.get()->getSamples(at, buffer);
+    }}
     bool isEmpty() const { return queue.empty(); }
     bool isLooping() const { return _isLooping; }
     bool isShuffling() const { return _isShuffling; }
     bool hasNext() const { return !isEmpty() && (queueIndex + 1 < queue.size() || _isLooping); }
     bool hasPrevious() const { return !isEmpty() && (queueIndex > 0 || _isLooping); }
-    const std::string& current() { return queue[queueIndex]; }
+    std::string current() { return queueIndex < queue.size() ? queue[queueIndex] : ""; }
     // Actions
     void play() { if (player.get() != nullptr) { player.get()->play(); } }
     void pause() { if (player.get() != nullptr) { player.get()->pause(); } }

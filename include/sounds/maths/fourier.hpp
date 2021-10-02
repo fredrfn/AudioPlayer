@@ -4,6 +4,7 @@
 #include <vector>
 #include "sounds/maths/complex.hpp"
 
+std::vector<Complex> fft(const std::vector<float>& input);
 std::vector<Complex> fft(const std::vector<Complex>& input, bool isLengthPowerOfTwo = false);
 std::vector<Complex> ifft(const std::vector<Complex>& input);
 

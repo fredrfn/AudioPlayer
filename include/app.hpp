@@ -12,15 +12,13 @@
 
 class AudioProcessors {
     Amplifier _amplifier;
-    Delay _delay = {0, 0};
     Echo _echo;
     Equalizer _equalizer;
 public:
     Amplifier& amplifier() { return _amplifier; }
-    Delay& delay() { return _delay; }
     Echo& echo() { return _echo; }
     Equalizer& equalizer() { return _equalizer; }
-    std::vector<SoundProcessor*> all() { return { &_equalizer, &_echo, &_delay, &_amplifier }; }
+    std::vector<SoundProcessor*> all() { return { &_equalizer, &_echo, &_amplifier }; }
     void enableAll() { for(auto processor: all()) { processor->enable(); }}
     void disableAll() { for (auto processor: all()) { processor->disable(); }}
 };
@@ -32,6 +30,8 @@ class App {
     SoundFilesPlayer _audioPlayer;
     AudioProcessors _processors;
 public:
+    void* audioCallbackContext;
+    void(*audioCallback)(void*, const SoundBuffer& buffer);
     App(QApplication& app);
     int run();
     void quit();
