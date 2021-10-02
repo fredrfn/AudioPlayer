@@ -21,18 +21,7 @@ void ControlsView::init() {
     playerLayout->addWidget(currentTimeLabel);
 
     playerSlider = new QSlider(Qt::Horizontal);
-    playerSlider->setStyleSheet(R"(
-        QSlider::groove:horizontal {
-            border: 1px solid #cccccc;
-            height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #d4d4d4, stop:1 #f8f8f8);
-        }
-        QSlider::handle:horizontal {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
-            border: 1px solid #cccccc;
-            width: 12px;
-        }
-    )");
+    playerSlider->setStyleSheet(sliderStylesheet("#4444f4", "#8888f8"));
     playerSlider->setMinimum(0);
     playerSlider->setMaximum(1000);
     connect(playerSlider, &QSlider::valueChanged, this, &ControlsView::jumpAt);
@@ -71,6 +60,8 @@ void ControlsView::init() {
     volumeSlider->setFixedWidth(100);
     volumeSlider->setMinimum(0);
     volumeSlider->setMaximum(100);
+    volumeSlider->setStyleSheet(sliderStylesheet("#44f444", "#88f888"));
+
     connect(volumeSlider, &QSlider::valueChanged, this, &ControlsView::setVolume);
 
     buttonsLayout->addWidget(volumeSlider);
@@ -85,29 +76,29 @@ void ControlsView::init() {
 }
 
 void ControlsView::refresh() {
-    currentTimeLabel->setText(!app->audioPlayer.isEmpty() ? formatTime(round(app->audioPlayer.time())) : "--:--");
-    remainingTimeLabel->setText(!app->audioPlayer.isEmpty() ? formatTime(round(app->audioPlayer.duration() - app->audioPlayer.time())) : "--:--");
-    playButton->setEnabled(!app->audioPlayer.isEmpty());
-    if (app->audioPlayer.isPlaying()) {
-        playButton->setIcon(QIcon("assets/icons/pause2.png")); 
+    currentTimeLabel->setText(!app->audioPlayer().isEmpty() ? formatTime(round(app->audioPlayer().time())) : "--:--");
+    remainingTimeLabel->setText(!app->audioPlayer().isEmpty() ? formatTime(round(app->audioPlayer().duration() - app->audioPlayer().time())) : "--:--");
+    playButton->setEnabled(!app->audioPlayer().isEmpty());
+    if (app->audioPlayer().isPlaying()) {
+        playButton->setIcon(QPixmap("assets/icons/pause2.png"));
     } else {
-        playButton->setIcon(QIcon("assets/icons/play3.png")); 
+        playButton->setIcon(QPixmap("assets/icons/play3.png"));
     }
-    playButton->setStyleSheet(buttonStylesheet(app->audioPlayer.isPlaying()));
-    stopButton->setEnabled(!app->audioPlayer.isEmpty());
-    nextButton->setEnabled(app->audioPlayer.hasNext());
-    previousButton->setEnabled(app->audioPlayer.hasPrevious());
-    loopButton->setStyleSheet(buttonStylesheet(app->audioPlayer.isLooping()));
-    shuffleButton->setStyleSheet(buttonStylesheet(app->audioPlayer.isShuffling()));
-    playerSlider->setEnabled(!app->audioPlayer.isEmpty());
-    volumeSlider->setValue(app->amplifier.gain() * 100);
+    playButton->setStyleSheet(buttonStylesheet(app->audioPlayer().isPlaying()));
+    stopButton->setEnabled(!app->audioPlayer().isEmpty());
+    nextButton->setEnabled(app->audioPlayer().hasNext());
+    previousButton->setEnabled(app->audioPlayer().hasPrevious());
+    loopButton->setStyleSheet(buttonStylesheet(app->audioPlayer().isLooping()));
+    shuffleButton->setStyleSheet(buttonStylesheet(app->audioPlayer().isShuffling()));
+    playerSlider->setEnabled(!app->audioPlayer().isEmpty());
+    volumeSlider->setValue(app->processors().amplifier().gain() * 100);
     playerSlider->blockSignals(true);
-    playerSlider->setValue(1000 * app->audioPlayer.progress());
+    playerSlider->setValue(1000 * app->audioPlayer().progress());
     playerSlider->blockSignals(false);
 }
 
 QString ControlsView::buttonStylesheet(bool active) {
-    QString borderColor = active ? "#996655" : "#CCCCCC";
+    QString borderColor = active ? "#4444d4" : "#CCCCCC";
     return R"(
         QPushButton {
             border-style: outset; 
@@ -122,10 +113,34 @@ QString ControlsView::buttonStylesheet(bool active) {
     )";
 }
 
+QString ControlsView::sliderStylesheet(QString color1, QString color2) {
+    return R"(
+        QSlider::groove:horizontal {
+            border: 1px solid #cccccc;
+            height: 8px; /* the groove expands to the size of the slider by default. by giving it a height, it has a fixed size */
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #d4d4d4, stop:1 #f8f8f8);
+        }
+        QSlider::sub-page:horizontal {
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 )" + color1 + ", stop:1 " + color2 + R"();
+            height: 6px;
+            margin-top: 1px;
+        }
+        QSlider::handle:horizontal {
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #b4b4b4, stop:1 #8f8f8f);
+            border: 1px solid #cccccc;
+            width: 12px;
+            height: 10px;
+            margin-left: -1px;
+            margin-bottom: -1px;
+        }
+    )";
+}
+
 QPushButton* ControlsView::setupControlButton(QString icon) {
     auto btn = new QPushButton;
     btn->setFixedSize(QSize(32, 32));
-    btn->setIcon(QIcon(icon));
+    // btn->setIcon(QIcon(icon)); This creates a memory leak!!
+    btn->setIcon(QPixmap(icon));
     btn->setIconSize(QSize(16, 16));
     btn->setStyleSheet(buttonStylesheet(false));
     buttonsLayout->addWidget(btn);
@@ -140,57 +155,57 @@ QString ControlsView::formatTime(double timeInSeconds) {
 }
 
 void ControlsView::togglePlay() {
-    if (app->audioPlayer.isPlaying()) {
-        app->audioPlayer.pause();
+    if (app->audioPlayer().isPlaying()) {
+        app->audioPlayer().pause();
     } else {
-        app->audioPlayer.play();
+        app->audioPlayer().play();
     }
     app->ui().refreshAll();
 }
 
 void ControlsView::stop() {
-    app->audioPlayer.stop();
+    app->audioPlayer().stop();
     app->ui().refreshAll();
 }
 
 void ControlsView::next() {
-    app->audioPlayer.next();
+    app->audioPlayer().next();
     app->ui().refreshAll();
 }
 
 void ControlsView::previous() {
-    app->audioPlayer.previous();
+    app->audioPlayer().previous();
     app->ui().refreshAll();
 }
 
 void ControlsView::shuffle() {
-    app->audioPlayer.toggleShuffling();
+    app->audioPlayer().toggleShuffling();
     app->ui().refreshAll();
 }
 
 void ControlsView::loop() {
-    app->audioPlayer.toggleLoop();
+    app->audioPlayer().toggleLoop();
     app->ui().refreshAll();
 }
 
 void ControlsView::volumeUp() {
-    float volume = app->amplifier.gain();
-    app->amplifier.gain(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
+    float volume = app->processors().amplifier().gain();
+    app->processors().amplifier().gain(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
     app->ui().refreshAll();
 }
 
 void ControlsView::volumeDown() {
-    float volume = app->amplifier.gain();
-    app->amplifier.gain(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
+    float volume = app->processors().amplifier().gain();
+    app->processors().amplifier().gain(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
     app->ui().refreshAll();
 }
 
 void ControlsView::setVolume(int progress) {
-    app->amplifier.gain((float)progress / 100.0f);
+    app->processors().amplifier().gain((float)progress / 100.0f);
     app->ui().refreshAll();
 }
 
 void ControlsView::jumpAt(int progress) {
-    app->audioPlayer.jumpAt(app->audioPlayer.duration() * (float)progress / 1000.0f);
+    app->audioPlayer().jumpAt(app->audioPlayer().duration() * (float)progress / 1000.0f);
     app->ui().refreshAll();
 }

@@ -26,17 +26,17 @@ int main(int argc, char* argv[]) {
 
 #include "sounds/sound_player.hpp"
 #include "sounds/sounds/files/mp3_file.hpp"
-#include "sounds/sounds/synth/basic/sine_wave.hpp"
+#include "sounds/sounds/synth/basic/fourier_wave.hpp"
 #include <iostream>
 
 int main() {
     //MP3File file("C:/Users/fredr/Downloads/Rejuvenation - v13/Audio/BGM/Battle - Conclusive.mp3");
     //SoundPlayer player(file);
-    Pitch frequency = PitchData("A4").frequency();
-    SineWave sine(frequency);
-    SoundPlayer player(sine);
+    auto fourier = FourierSeriesAmplitudePhase(1.0/PitchData("A4").frequency(), {0, 0.5, 0.1, 0.09, 0.1, 0.05, 0.02}, {0, 0, 0, 0, 0, 0, 0});
+    FourierWave sound(fourier);
+    SoundPlayer player(sound);
     player.play();
-    while(player.time() < 10.0) {}
+    while(player.time() < 5.0) {}
     return 0;
 }
 

@@ -3,18 +3,23 @@
 
 App::App(QApplication& app) : 
     qtApplication(app),
-    audioPlayer(
-        { &amplifier }, 
+    _audioPlayer(
+        _processors.all(), 
         this, 
-        [](void* context) { emit (reinterpret_cast<App*>(context))->window.refresh(); },
-        [](void* context) { emit (reinterpret_cast<App*>(context))->audioPlayer.next(); }
+        [](void* context, [[maybe_unused]]const SoundBuffer& buffer) { 
+            emit (reinterpret_cast<App*>(context))->ui().mainWindow.refresh();
+        },
+        [](void* context) { emit (reinterpret_cast<App*>(context))->audioPlayer().next(); }
     ) 
-{}
+{
+    processors().disableAll();
+    processors().amplifier().enable();
+}
 
 int App::run() {
-    window.setApp(this);
-    window.refreshAll();
-    window.show();
+    ui().setApp(this);
+    ui().refreshAll();
+    ui().mainWindow.show();
     return qtApplication.exec();
 }
 

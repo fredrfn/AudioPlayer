@@ -20,7 +20,7 @@ public:
     unsigned long long bytesLength() const { return length() * 4; }
     float read(unsigned long long index) const { return buffer[index]; }
     float read(SampleCount at, ChannelsCount channel) const { return read((at * channelsCount) + channel); }
-    void write(unsigned long long index, float value) { buffer[index] = fmax(-1.0f, fmin(1.0f, value)); }
+    void write(unsigned long long index, float value) { if(index < length()) buffer[index] = fmax(-1.0f, fmin(1.0f, value)); }
     void write(SampleCount at, ChannelsCount channel, float value) { write((at * channelsCount) + channel, value); }
     void reset() { memset((unsigned char*)buffer, 0, bytesLength()); }
 };

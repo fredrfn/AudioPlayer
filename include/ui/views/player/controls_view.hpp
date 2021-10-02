@@ -1,5 +1,5 @@
-#ifndef CONTROLS_VIEW_HPP
-#define CONTROLS_VIEW_HPP
+#ifndef UI_VIEWS_PLAYER_CONTROLS_VIEW_HPP
+#define UI_VIEWS_PLAYER_CONTROLS_VIEW_HPP
 
 #include "ui/qt_view.hpp"
 
@@ -8,7 +8,6 @@ class QVBoxLayout;
 class QPushButton;
 class QSlider;
 class QLabel;
-class AudioPlayer;
 
 class ControlsView : public QtView {
     QVBoxLayout* layout;
@@ -31,9 +30,9 @@ class ControlsView : public QtView {
 
     QPushButton* setupControlButton(QString icon);
     QString buttonStylesheet(bool active = false);
+    QString sliderStylesheet(QString color1, QString color2);
 protected: 
     virtual void init();
-public:
     virtual void refresh();
 private slots:
     void togglePlay();

@@ -4,28 +4,37 @@
 #include "sounds/backends/portaudio_backend.hpp"
 #include "sounds/sound.hpp"
 #include <vector>
+#include <mutex>
 
 class SoundProcessor;
+class SoundBuffer;
 
 // Class allowing basic audio playback
 class SoundPlayer {
     unsigned long long currentSample = 0;
     bool _isPlaying = false;
+    bool isBusy = false;
     PortaudioBackend portaudio;
     SoundBackend& backend() { return portaudio; }
     std::vector<SoundProcessor*> processors;
     void* playCallbackContext = nullptr;
-    void (*playCallback)(void*) = nullptr;
+    void (*playCallback)(void*, const SoundBuffer& buffer) = nullptr;
     void (*playEndedCallback)(void*) = nullptr;
     Sound& sound;
+    std::mutex destroyMutex;
 public:
     SoundPlayer(
         Sound& sound,
         std::vector<SoundProcessor*> processors = {},
         void* playCallbackContext = nullptr,
-        void (*playCallback)(void*) = nullptr,
+        void (*playCallback)(void*, const SoundBuffer& buffer) = nullptr,
         void (*playEndedCallback)(void*) = nullptr
     );
+    ~SoundPlayer() { wait(); }
+    void wait() { 
+        destroyMutex.lock();
+        destroyMutex.unlock();
+    }
     bool isPlaying() const { return _isPlaying; }
     double time() const { return sound.samplingRate() > 0 ? currentSample / sound.samplingRate() : 0.0; }
     float progress() const { return sound.sampleCount() > 0 ? (float)currentSample / sound.sampleCount() : 0.0f; }

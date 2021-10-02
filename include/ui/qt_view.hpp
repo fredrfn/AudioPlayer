@@ -2,29 +2,30 @@
 #define QT_VIEW_HPP
 
 #include <QObject>
-#include <QWidget>
 #include <vector>
 
 class App;
+class QWidget;
 
 class QtView : public QObject {
     Q_OBJECT
 protected:
     App* app;
     QWidget* root = nullptr;
+    QtView* parent = nullptr;
     virtual void init() = 0; // responsible for setup/allocating widgets/children
+    virtual void refresh() {}; // responsible for propagating app state to widgets
 public:
-    QWidget* widget() {
-        if (root == nullptr) { init(); }
+    virtual std::vector<QtView*> children() { return {}; } // must contain the list of all subviews
+    QWidget* widget(QtView* parentView) { // QtView -> QWidget transformation
+        if (root == nullptr) { parent = parentView; init(); }
         return root;
     }
-    virtual std::vector<QtView*> children() { return {}; }
-    void setApp(App* application) { 
+    void setApp(App* application) { // app context propagation
         app = application; 
         for(auto& child : children()) { child->setApp(application); } 
     }
-    virtual void refresh() = 0;
-    void refreshAll() {
+    void refreshAll() { // this method synchronizes the app state to the ui widgets, recursively
         refresh();
         for(auto& child : children()) { child->refreshAll(); } 
     }

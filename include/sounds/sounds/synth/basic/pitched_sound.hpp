@@ -4,10 +4,6 @@
 #include "sounds/music/pitch.hpp"
 #include "sounds/sound.hpp"
 
-#ifndef M_PI
-#define M_PI (3.14159265358979323846)
-#endif
-
 class PitchedSound : public Sound {
 protected:
     Pitch _pitch;

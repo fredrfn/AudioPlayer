@@ -1,22 +1,25 @@
-#ifndef PLAYER_VIEW_HPP
-#define PLAYER_VIEW_HPP
-
+#ifndef UI_VIEWS_PLAYER_VIEW_HPP
+#define UI_VIEWS_PLAYER_VIEW_HPP
 
 #include "ui/qt_view.hpp"
 #include "ui/views/player/controls_view.hpp"
-#include "ui/views/player/queue_view.hpp"
+#include "ui/views/player/effects_view.hpp"
+#include "ui/views/player/visualizers_view.hpp"
 
-class QHBoxLayout;
-class AudioPlayer;
+class QSplitter;
+class QVBoxLayout;
+class QWidget;
 
 class PlayerView : public QtView {
+    QSplitter* splitter;
+    VisualizersView visualizers;
+    QWidget* controlEffectsContainer;
+    QVBoxLayout* controlEffectsLayout;
     ControlsView controls;
-    QHBoxLayout* layout;
-protected: 
-    virtual void init();
+    EffectsView effects;
+    virtual void init() override;
 public:
-    virtual void refresh();
-    virtual std::vector<QtView*> children() { return {&controls}; };
+    virtual std::vector<QtView*> children() { return {&visualizers, &controls, &effects}; }
 };
 
 #endif 

@@ -1,6 +1,7 @@
 #include "ui/views/menu_view.hpp"
 
 #include <QMenuBar>
+#include <QFrame>
 #include "app.hpp"
 #include <QFileDialog>
 #include <QMessageBox>
@@ -81,16 +82,16 @@ void MenuView::init() {
 
     helpMenu = menubar->addMenu(tr("&Help"));
     helpMenu->addAction(aboutAction);
-
+    
     root = menubar;
 }
 
 void MenuView::refresh() {
-    playAction->setEnabled(!app->audioPlayer.isEmpty() && !app->audioPlayer.isPlaying());
-    pauseAction->setEnabled(app->audioPlayer.isPlaying());
-    stopAction->setEnabled(!app->audioPlayer.isEmpty());
-    nextAction->setEnabled(app->audioPlayer.hasNext());
-    previousAction->setEnabled(app->audioPlayer.hasPrevious());
+    playAction->setEnabled(!app->audioPlayer().isEmpty() && !app->audioPlayer().isPlaying());
+    pauseAction->setEnabled(app->audioPlayer().isPlaying());
+    stopAction->setEnabled(!app->audioPlayer().isEmpty());
+    nextAction->setEnabled(app->audioPlayer().hasNext());
+    previousAction->setEnabled(app->audioPlayer().hasPrevious());
 }
 
 void MenuView::about() {
@@ -116,7 +117,7 @@ Contact: fred.rouffineau@gmail.com
 
 QString MenuView::supportedFilesFormatString() {
     std::string formats = "";
-    for (auto const& [extension, _] : app->audioPlayer.supportedFiles) {
+    for (auto const& [extension, _] : app->audioPlayer().supportedFiles) {
         formats += "*." + extension + " ";
     }
     return tr("Audio files") + QString::fromStdString(" (" + formats + ")");
@@ -130,7 +131,7 @@ void MenuView::open() {
         supportedFilesFormatString()
     );
     if (fileName.isEmpty() || fileName.isNull()) { return; }
-    app->audioPlayer.openFile(fileName.toStdString());
+    app->audioPlayer().openFile(fileName.toStdString());
     app->ui().refreshAll();
 }
 
@@ -146,7 +147,7 @@ void MenuView::openMultiple() {
     std::vector<std::string> fileNames = {};
     for(auto& file : files) { fileNames.push_back(file.toStdString()); }
     
-    app->audioPlayer.openFiles(fileNames);
+    app->audioPlayer().openFiles(fileNames);
     app->ui().refreshAll();
 }
 
@@ -157,7 +158,7 @@ void MenuView::openFolder() {
         "/home"
     );
     if(!folder.isEmpty() && !folder.isNull()){
-        app->audioPlayer.openFolder(folder.toStdString());
+        app->audioPlayer().openFolder(folder.toStdString());
         app->ui().refreshAll();
     }
 }
@@ -167,53 +168,53 @@ void MenuView::exit() {
 }
 
 void MenuView::play() {
-    app->audioPlayer.play();
+    app->audioPlayer().play();
     app->ui().refreshAll();
 }
 
 void MenuView::pause() {
-    app->audioPlayer.pause();
+    app->audioPlayer().pause();
     app->ui().refreshAll();
 }
 
 void MenuView::stop() {
-    app->audioPlayer.stop();
+    app->audioPlayer().stop();
     app->ui().refreshAll();
 }
 
 void MenuView::next() {
-    app->audioPlayer.next();
+    app->audioPlayer().next();
     app->ui().refreshAll();
 }
 
 void MenuView::previous() {
-    app->audioPlayer.previous();
+    app->audioPlayer().previous();
     app->ui().refreshAll();
 }
 
 void MenuView::shuffle() {
-    app->audioPlayer.toggleShuffling();
+    app->audioPlayer().toggleShuffling();
     app->ui().refreshAll();
 }
 
 void MenuView::loop() {
-    app->audioPlayer.toggleLoop();
+    app->audioPlayer().toggleLoop();
     app->ui().refreshAll();
 }
 
 void MenuView::volumeUp() {
-    float volume = app->amplifier.gain();
-    app->amplifier.gain(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
+    float volume = app->processors().amplifier().gain();
+    app->processors().amplifier().gain(volume + 0.1f <= 1.0f ? volume + 0.1f : 1.0f);
     app->ui().refreshAll();
 }
 
 void MenuView::volumeDown() {
-    float volume = app->amplifier.gain();
-    app->amplifier.gain(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
+    float volume = app->processors().amplifier().gain();
+    app->processors().amplifier().gain(volume - 0.1f >= 0.0f ? volume - 0.1f : 0.0f);
     app->ui().refreshAll();
 }
 
 void MenuView::mute() {
-    app->amplifier.gain(0.0f);
+    app->processors().amplifier().gain(0.0f);
     app->ui().refreshAll();
 }

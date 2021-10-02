@@ -18,7 +18,7 @@ class SoundFilesPlayer {
     std::unique_ptr<SoundPlayer> player;
     std::vector<SoundProcessor*> processors;
     void* playCallbackContext = nullptr;
-    void (*playCallback)(void*) = nullptr;
+    void (*playCallback)(void*, const SoundBuffer&) = nullptr;
     void (*playEndedCallback)(void*) = nullptr;
     // Queue
     std::vector<std::string> queue;
@@ -29,12 +29,12 @@ class SoundFilesPlayer {
     std::random_device randomDevice;
     void switchFile(unsigned int index);
     Sound* buildSound(const std::string& filePath);
-    void sortQueue();
+    void sortQueue(bool ignoreCurrent = false);
 public:
     SoundFilesPlayer(
         std::vector<SoundProcessor*> processors = {},
         void* playCallbackContext = nullptr,
-        void (*playCallback)(void*) = nullptr,
+        void (*playCallback)(void*, const SoundBuffer&) = nullptr,
         void (*playEndedCallback)(void*) = nullptr
     );
     std::map<std::string, SoundFile*(*)(const std::string&)> supportedFiles;
@@ -56,7 +56,10 @@ public:
     void jumpAt(double time) { if (player.get() != nullptr) { player.get()->jumpAt(time); } }
     void next() { if (hasNext()) { switchFile(queueIndex + 1); } }
     void previous() { if (hasPrevious()) { switchFile(queueIndex - 1); } }
-    void toggleShuffling() { _isShuffling = !_isShuffling; sortQueue(); }
+    void toggleShuffling() { 
+        _isShuffling = !_isShuffling; 
+        sortQueue(); 
+    }
     void toggleLoop() { _isLooping = !_isLooping; }
     void openFile(std::string file);
     void openFiles(std::vector<std::string> files);

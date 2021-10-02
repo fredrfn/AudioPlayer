@@ -9,12 +9,13 @@
 #include <cctype>
 #include <cstring>
 #include <filesystem>
+#include <mutex>
 
 SoundPlayer::SoundPlayer(
     Sound& sound,
     std::vector<SoundProcessor*> processors,
     void* playCallbackContext,
-    void (*playCallback)(void*),
+    void (*playCallback)(void*, const SoundBuffer& buffer),
     void (*playEndedCallback)(void*)
 ) : 
     sound(sound),
@@ -25,6 +26,7 @@ SoundPlayer::SoundPlayer(
 {
     backend().setup(this, [](SoundPlayer* player, [[maybe_unused]]const void* input, void* output, unsigned long channelLength) {
         // Buffer preparation
+        player->destroyMutex.lock();
         Sound& sound = player->sound;
         SampleCount sampleCount = sound.sampleCount();
         SoundBuffer buffer(sound.channelsCount(), channelLength, reinterpret_cast<float*>(output));
@@ -36,13 +38,14 @@ SoundPlayer::SoundPlayer(
         }
         // Broadcast notification
         if (player->playCallback != nullptr) {
-            player->playCallback(player->playCallbackContext);
+            player->playCallback(player->playCallbackContext, buffer);
         }
         // Playback management
         unsigned long long nextSample = player->currentSample + channelLength;
         if (nextSample > sampleCount) { 
             player->currentSample = sampleCount;
             player->stop();
+            player->destroyMutex.unlock();
             if (player->playEndedCallback != nullptr) {
                 player->playEndedCallback(player->playCallbackContext);
             }
@@ -50,6 +53,7 @@ SoundPlayer::SoundPlayer(
         } else {
             player->currentSample = nextSample;
         }
+        player->destroyMutex.unlock();
         return player->isPlaying();
     });
 }

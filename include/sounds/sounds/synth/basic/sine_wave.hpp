@@ -1,8 +1,7 @@
 #ifndef SOUND_SYNTH_BASIC_SINE_WAVE_HPP
 #define SOUND_SYNTH_BASIC_SINE_WAVE_HPP
 
-#include "sounds/sounds/synth/pitched_sound.hpp"
-#include <cmath>
+#include "sounds/sounds/synth/basic/pitched_sound.hpp"
 
 class SineWave : public PitchedSound {
 protected:
@@ -16,23 +15,10 @@ public:
         SamplingRate samplingRate = 44100, 
         ChannelsCount channelsCount = 2, 
         SampleCount sampleCount = SAMPLE_COUNT_INFINITE
-    ) : 
-        PitchedSound(pitch, samplingRate, channelsCount, sampleCount),
-        _amplitude(amplitude),
-        _phaseOffset(phaseOffset)
-    {}
+    );
     float amplitude() { return _amplitude; }
     float phaseOffset() { return _phaseOffset; }
-    virtual void getSamples(SampleCount at, SoundBuffer& buffer) override {
-        if (samplingRate() == 0) { return; }
-        for(SampleCount sample = 0; sample < buffer.channelLength(); sample++) {
-            float time = (_phaseOffset + at + sample) / samplingRate();
-            float value = amplitude() * sinf(2 * (float)M_PI * _pitch * time);
-            for(ChannelsCount channel = 0; channel < channelsCount(); channel++) {
-                buffer.write(sample, channel, value);
-            }
-        }
-    }
+    virtual void getSamples(SampleCount at, SoundBuffer& buffer) override;
 };
 
 #endif

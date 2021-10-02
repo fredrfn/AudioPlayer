@@ -32,7 +32,6 @@ class MenuView : public QtView {
     QString supportedFilesFormatString();
 protected: 
     virtual void init();
-public:
     virtual void refresh();
 private slots:
     void about();
