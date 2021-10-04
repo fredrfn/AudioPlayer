@@ -25,18 +25,27 @@ int main(int argc, char* argv[]) {
 #else 
 
 #include "sounds/sound_player.hpp"
-#include "sounds/sounds/files/mp3_file.hpp"
 #include "sounds/sounds/synth/basic/fourier_wave.hpp"
+#include "sounds/sounds/synth/sound_sequence.hpp"
 #include <iostream>
+#include <vector>
+#include <string>
 
 int main() {
-    //MP3File file("C:/Users/fredr/Downloads/Rejuvenation - v13/Audio/BGM/Battle - Conclusive.mp3");
-    //SoundPlayer player(file);
-    auto fourier = FourierSeriesAmplitudePhase(1.0/PitchData("A4").frequency(), {0, 0.5, 0.1, 0.09, 0.1, 0.05, 0.02}, {0, 0, 0, 0, 0, 0, 0});
-    FourierWave sound(fourier);
-    SoundPlayer player(sound);
+    std::vector<std::string> notes = { "Gb3", "Bb3", "Ab3", "C4", "Bb3" };
+    SoundSequence soundSequence;
+    for (auto& note: notes) {
+        FourierWave* sound = new FourierWave(FourierSeriesAmplitudePhase(
+            1.0/PitchData(note).frequency(), 
+            {0, 0.5, 0.1, 0.09, 0.1, 0.05, 0.02}, 
+            {0, 0, 0, 0, 0, 0, 0}
+        ), 44100, 2, 44100);
+        soundSequence << sound;
+    }
+    std::cout << soundSequence.sampleCount() << std::endl;
+    SoundPlayer player(soundSequence);
     player.play();
-    while(player.time() < 5.0) {}
+    while(player.time() < player.duration()) {}
     return 0;
 }
 

@@ -4,22 +4,24 @@
 
 // inspired by http://www.cardinalpeak.com/blog?p=1841
 
-const std::vector<float>& FIRFilter::factors(SamplingRate samplingRate) {
-    if (_lastSamplingRate == samplingRate && !hasChanged && _factors.size() > 0) { return _factors; }
+const std::vector<float>& FIRFilter::taps(SamplingRate samplingRate) {
+    if (_lastSamplingRate == samplingRate && !hasChanged && _taps.size() > 0) { return _taps; }
     _lastSamplingRate = samplingRate;
-    _factors = computeFactors(samplingRate);
-    return _factors;
+    _taps = computetaps(samplingRate);
+    hasChanged = false;
+    return _taps;
 }
 
-std::vector<float> FIRFilter::computeFactors(SamplingRate samplingRate) {
+std::vector<float> FIRFilter::computetaps(SamplingRate samplingRate) {
     std::vector<float> result;
     result.resize(_order, 0.0f);
+    memset(oldSamples, 400, 0);
 
-    double pulseLower = 2 * PI * _lowerFrequency / samplingRate;
-    double pulseUpper = 2 * PI * _upperFrequency / samplingRate;
+    double pulseLower = 2.0 * PI * _lowerFrequency / samplingRate;
+    double pulseUpper = 2.0 * PI * _upperFrequency / samplingRate;
 
     for(unsigned int n = 0; n < _order; n++){
-        double mm = n - (_order - 1.0) / 2.0;
+        double mm = (double)n - ((double)_order - 1.0) / 2.0;
         if (isLowPass()) {
             result[n] = (float)((mm == 0.0) ? pulseUpper / PI : (sin(mm * pulseUpper) / (mm * PI)));
         } else if (isHighPass()) {
@@ -39,29 +41,29 @@ void FIRFilter::setFrequencies(double f1, double f2) {
 }
 
 void FIRFilter::processSamples(Sound* sound, SampleCount at, SoundBuffer& buffer) {
-    if (!isValid(sound->samplingRate()) || at < _order) return;
-    auto& factorTaps = factors(sound->samplingRate());
+    if (!isValid(sound->samplingRate()) || at < _order || _order == 0) return;
+    if (_gain == 0) { buffer.reset(); return; }
 
-    float* oldSamplesMemory = new float[buffer.length()];
-    SoundBuffer oldSamplesBuffer(sound->channelsCount(), buffer.channelLength(), oldSamplesMemory);
-    sound->getSamples(at - _order, oldSamplesBuffer);
+    std::vector<float> factorTaps = taps(sound->samplingRate());
+    size_t size = factorTaps.size();
 
-    for(ChannelsCount channel = 0; sound->channelsCount(); channel++) {
-        for (SampleCount sample = 0; buffer.channelLength(); sample++) {
+    for(ChannelsCount channel = 0; channel < sound->channelsCount(); channel++) {
+        for (SampleCount sample = 0; sample < buffer.channelLength(); sample++) {
+            // TOFIX: a ring/circular buffer might be better
+            for(size_t i = size - 1; i >= 1; i--){
+		        oldSamples[i] = oldSamples[i-1];
+            }	
+            oldSamples[0] = buffer.read(sample, channel);
             float result = 0;
-            for(unsigned int i = 0; i < _order; i++) { 
-                result += oldSamplesBuffer.read(sample, channel) * factorTaps[_order - i - 1];
-            }
-            buffer.write(sample, channel, result);
+            for(size_t i = 0; i < size; i++) result += oldSamples[i] * factorTaps[i];
+            buffer.write(sample, channel, _gain * result);
         }
     }
-
-    delete[] oldSamplesMemory;
 }
 
 bool FIRFilter::isValid(SamplingRate rate) const {
     double nyquistFrequency = rate / 2;
-    return _order > 0 || (_upperFrequency || _lowerFrequency) && nyquistFrequency > 0 &&
+    return _order > 0 && (_upperFrequency || _lowerFrequency) && nyquistFrequency > 0 &&
         _upperFrequency < nyquistFrequency && _lowerFrequency < nyquistFrequency;  
 }
 
@@ -87,4 +89,14 @@ FIRFilter FIRFilter::bandPass(double lowerFrequency, double higherFrequency, uns
     FIRFilter filter(order); 
     filter.setAsBandPass(lowerFrequency, higherFrequency); 
     return filter; 
+}
+
+float FIRFilter::centralFrequency() {
+    if  (isHighPass()) {
+        return (float)_lowerFrequency;
+    } else if (isLowPass()) {
+        return (float)_upperFrequency;
+    } else {
+        return (float)((_lowerFrequency + _upperFrequency) / 2.0f);
+    }
 }

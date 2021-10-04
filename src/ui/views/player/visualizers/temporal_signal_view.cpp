@@ -2,15 +2,7 @@
 
 #include <QChartView>
 #include <QLineSeries>
-#include <QRandomGenerator>
-#include <QValueAxis>
-#include <QDateTimeAxis>
-#include <QDateTime>
 #include "app.hpp"
-#include <chrono>
-#include "ui/helpers/strings_helper.hpp"
-#include <iostream>
-using namespace std::chrono_literals;
 
 void TemporalSignalView::init() {
     chart = new QChart();
@@ -28,13 +20,8 @@ void TemporalSignalView::init() {
 }
 
 void TemporalSignalView::refresh() {
-    if (!isInitialized) {
+    if (isFirstRefresh) {
         accumulator.reserve(24000);
-        app->audioCallbackContext = this;
-        app->audioCallback = [](void* ctx, const SoundBuffer& buffer) {
-            reinterpret_cast<TemporalSignalView*>(ctx)->gatherSamples(buffer);    
-        };
-        isInitialized = true;
     }
     chart->blockSignals(true);
     series->replace(accumulator);

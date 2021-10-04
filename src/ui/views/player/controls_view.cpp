@@ -168,16 +168,19 @@ void ControlsView::stop() {
 
 void ControlsView::next() {
     app->audioPlayer().next();
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 
 void ControlsView::previous() {
     app->audioPlayer().previous();
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 
 void ControlsView::shuffle() {
     app->audioPlayer().toggleShuffling();
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 

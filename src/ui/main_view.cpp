@@ -33,9 +33,10 @@ void MainView::refresh() {
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent) {
     setWindowTitle(tr("AudioPlayer"));
-    resize(800, 400);
-    setMinimumSize(800, 400);
+    resize(800, 600);
+    setMinimumSize(800, 600);
     connect(this, SIGNAL(refresh(SoundBuffer)), this, SLOT(refreshAll(SoundBuffer)));
+    connect(this, SIGNAL(fireFilesChanged()), this, SLOT(fireFilesChangedCallback()));
 }
 
 void MainWindow::refreshAll(SoundBuffer buffer) {
@@ -43,8 +44,16 @@ void MainWindow::refreshAll(SoundBuffer buffer) {
     view->refreshAll(); 
 }
 
+void MainWindow::fireFilesChangedCallback() {
+    view->fireFilesChanged();
+}
+
 void MainView::processAudioEvent(SoundBuffer buffer){
     if (app->audioCallback != nullptr) {
         app->audioCallback(app->audioCallbackContext, buffer);
     }
+}
+
+void MainView::fireFilesChanged(){
+    app->fireFilesChangedCallback();
 }

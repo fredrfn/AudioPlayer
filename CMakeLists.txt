@@ -25,6 +25,7 @@ add_executable(${TARGET_NAME}
     include/ui/qt_view.hpp
     include/ui/main_view.hpp
     include/ui/views/menu_view.hpp
+    include/ui/views/sidebar/queue_view.hpp
     include/ui/views/player/visualizers_view.hpp
     # Sources list
     src/sounds/backends/portaudio_backend.cpp

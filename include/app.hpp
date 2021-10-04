@@ -15,6 +15,7 @@ class AudioProcessors {
     Echo _echo;
     Equalizer _equalizer;
 public:
+    AudioProcessors() : _equalizer(Equalizer::create15Bands()) {}
     Amplifier& amplifier() { return _amplifier; }
     Echo& echo() { return _echo; }
     Equalizer& equalizer() { return _equalizer; }
@@ -30,14 +31,21 @@ class App {
     SoundFilesPlayer _audioPlayer;
     AudioProcessors _processors;
 public:
-    void* audioCallbackContext;
-    void(*audioCallback)(void*, const SoundBuffer& buffer);
+    void* audioCallbackContext = nullptr;
+    void(*audioCallback)(void*, const SoundBuffer& buffer) = nullptr;
+    void* filesChangedCallbackContext = nullptr;
+    void(*filesChangedCallback)(void*) = nullptr;
     App(QApplication& app);
     int run();
     void quit();
     MainView& ui() { return _ui; }
     AudioProcessors& processors() { return _processors; }
     SoundFilesPlayer& audioPlayer() { return _audioPlayer; }
+    void fireFilesChangedCallback() {
+        if (filesChangedCallback != nullptr) {
+            filesChangedCallback(filesChangedCallbackContext);
+        }
+    }
 };
 
 #endif

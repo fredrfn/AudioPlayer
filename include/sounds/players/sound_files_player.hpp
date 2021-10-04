@@ -29,7 +29,6 @@ class SoundFilesPlayer {
     unsigned int queueIndex = 0;
     // Utilities
     std::random_device randomDevice;
-    void switchFile(unsigned int index);
     SoundFile* buildSound(const std::string& filePath);
     void sortQueue(bool ignoreCurrent = false);
 public:
@@ -49,15 +48,14 @@ public:
     ChannelsCount channels() { return sound.get() != nullptr ? sound.get()->channelsCount() : 0; }
     SamplingRate samplingRate() { return sound.get() != nullptr ? sound.get()->samplingRate() : 0; }
     SampleCount sampleCount() { return sound.get() != nullptr ? sound.get()->sampleCount() : 0; }
-    void getSamples(SampleCount at, SoundBuffer& buffer) { if(sound.get() != nullptr) {
-        sound.get()->getSamples(at, buffer);
-    }}
     bool isEmpty() const { return queue.empty(); }
     bool isLooping() const { return _isLooping; }
     bool isShuffling() const { return _isShuffling; }
     bool hasNext() const { return !isEmpty() && (queueIndex + 1 < queue.size() || _isLooping); }
     bool hasPrevious() const { return !isEmpty() && (queueIndex > 0 || _isLooping); }
     std::string current() { return queueIndex < queue.size() ? queue[queueIndex] : ""; }
+    const std::vector<std::string>& queuedFiles() { return queue; }
+    unsigned int currentQueueIndex() { return queueIndex; }
     // Actions
     void play() { if (player.get() != nullptr) { player.get()->play(); } }
     void pause() { if (player.get() != nullptr) { player.get()->pause(); } }
@@ -65,6 +63,7 @@ public:
     void jumpAt(double time) { if (player.get() != nullptr) { player.get()->jumpAt(time); } }
     void next() { if (hasNext()) { switchFile(queueIndex + 1); } }
     void previous() { if (hasPrevious()) { switchFile(queueIndex - 1); } }
+    void switchFile(unsigned int index);
     void toggleShuffling() { 
         _isShuffling = !_isShuffling; 
         sortQueue(); 

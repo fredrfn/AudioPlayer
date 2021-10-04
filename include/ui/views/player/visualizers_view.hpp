@@ -10,8 +10,8 @@ class QTabWidget;
 class VisualizersView : public QtView {
     QTabWidget* tabWidget;
     TemporalSignalView samples;
-    SpectrumView amplitudes = {SpectrumViewType::AMPLITUDES};
-    SpectrumView phases = {SpectrumViewType::PHASES};
+    SpectrumView amplitudes = {SpectrumViewType::AMPLITUDE};
+    SpectrumView phases = {SpectrumViewType::PHASE};
     bool isAnalyzerInit = false;
     virtual void init() override;
     virtual void refresh() override;

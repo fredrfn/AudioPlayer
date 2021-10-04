@@ -14,8 +14,6 @@ class SoundBuffer;
 class TemporalSignalView : public QtView {
     QChart* chart;
     QLineSeries* series;
-    bool hasChanges = false;
-    bool isInitialized = false;
     QVector<QPointF> accumulator;
     virtual void init() override;
     virtual void refresh() override;

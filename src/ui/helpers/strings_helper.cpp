@@ -28,3 +28,18 @@ std::string StringsHelper::extractFileExtension(const std::string& filePath) {
     std::string::size_type idx = filePath.rfind('.');
     return idx != std::string::npos ? filePath.substr(idx+1) : "";
 }
+
+std::string StringsHelper::formatFrequency(float frequency) {
+    unsigned int kHz = (unsigned int)(frequency / 1000);
+    unsigned int hz = (unsigned int)frequency % 1000;
+    if (kHz == 0) {
+        return std::to_string(hz) + "Hz";
+    } else {
+        if (hz == 0) {
+            return std::to_string(kHz) + "kHz";
+        } else {
+            hz = hz / 100;
+            return std::to_string(kHz) + "." + std::to_string(hz) + "kHz";
+        }
+    }
+};

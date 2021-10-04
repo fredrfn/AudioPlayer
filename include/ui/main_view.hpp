@@ -20,11 +20,13 @@ class MainWindow : public QMainWindow {
     MainView* view;
 public slots:
     void refreshAll(SoundBuffer);
+    void fireFilesChangedCallback();
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     void setView(MainView* v) { view = v; };
 signals:    
     void refresh(SoundBuffer);
+    void fireFilesChanged();
 };
 
 class MainView : public QtView {
@@ -40,6 +42,7 @@ public:
     MainWindow mainWindow;
     virtual std::vector<QtView*> children() override { return { &menu, &sidebar, &player }; }
     void processAudioEvent(SoundBuffer buffer);
+    void fireFilesChanged();
 };
 
 #endif

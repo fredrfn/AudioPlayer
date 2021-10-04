@@ -13,6 +13,7 @@ protected:
     App* app = nullptr;
     QWidget* root = nullptr;
     QtView* parent = nullptr;
+    bool isFirstRefresh = true;
     virtual void init() = 0; // responsible for setup/allocating widgets/children
     virtual void refresh() {}; // responsible for propagating app state to widgets
 public:
@@ -27,6 +28,7 @@ public:
     }
     void refreshAll() { // this method synchronizes the app state to the ui widgets, recursively
         refresh();
+        isFirstRefresh = false;
         for(auto& child : children()) { child->refreshAll(); } 
     }
 };

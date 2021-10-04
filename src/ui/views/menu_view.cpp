@@ -132,6 +132,7 @@ void MenuView::open() {
     );
     if (fileName.isEmpty() || fileName.isNull()) { return; }
     app->audioPlayer().openFile(fileName.toStdString());
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 
@@ -148,6 +149,7 @@ void MenuView::openMultiple() {
     for(auto& file : files) { fileNames.push_back(file.toStdString()); }
     
     app->audioPlayer().openFiles(fileNames);
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 
@@ -159,6 +161,7 @@ void MenuView::openFolder() {
     );
     if(!folder.isEmpty() && !folder.isNull()){
         app->audioPlayer().openFolder(folder.toStdString());
+        app->fireFilesChangedCallback();
         app->ui().refreshAll();
     }
 }
@@ -184,16 +187,19 @@ void MenuView::stop() {
 
 void MenuView::next() {
     app->audioPlayer().next();
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 
 void MenuView::previous() {
     app->audioPlayer().previous();
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 
 void MenuView::shuffle() {
     app->audioPlayer().toggleShuffling();
+    app->fireFilesChangedCallback();
     app->ui().refreshAll();
 }
 

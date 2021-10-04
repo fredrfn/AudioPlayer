@@ -10,7 +10,11 @@ App::App(QApplication& app) :
             auto a = reinterpret_cast<App*>(context);
             emit a->ui().mainWindow.refresh(buffer);
         },
-        [](void* context) { emit (reinterpret_cast<App*>(context))->audioPlayer().next(); }
+        [](void* context) { 
+            auto a = reinterpret_cast<App*>(context);
+            a->audioPlayer().next(); 
+            emit a->ui().mainWindow.fireFilesChanged();
+        }
     ),
     audioCallback(nullptr),
     audioCallbackContext(nullptr)

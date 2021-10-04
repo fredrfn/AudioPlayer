@@ -2,14 +2,22 @@
 #define UI_VIEWS_PLAYER_EFFECTS_ECHO_VIEW_HPP
 
 #include "ui/qt_view.hpp"
-#include <QLabel>
+
+class QSpinBox;
+class QSlider;
+class QCheckBox;
 
 class EchoView : public QtView {
-    virtual void init() override { 
-        root = new QLabel("Echo");
-        ((QLabel*)root)->setFrameStyle(QFrame::Panel | QFrame::Raised);
-        ((QLabel*)root)->setLineWidth(2);
-    }
+    QSpinBox* echoes;
+    QSlider* spacing;
+    QSlider* gain;
+    QCheckBox* toggler;
+    virtual void init() override;
+public slots: 
+    void setSpacing(int value);
+    void setGain(int value);
+    void setEchoes(int value);
+    void toggle();
 };
 
 #endif
