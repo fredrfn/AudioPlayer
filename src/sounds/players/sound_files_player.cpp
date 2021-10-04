@@ -97,7 +97,7 @@ void SoundFilesPlayer::openFiles(std::vector<std::string> files) {
 
 void SoundFilesPlayer::openFolder(std::string folder) {
     clear();
-    for (auto &p : std::filesystem::recursive_directory_iterator(folder)) {
+    for (auto &p : std::filesystem::directory_iterator(folder)) {
         std::string extension = p.path().extension().string();
         for (auto const& [supported, _] : supportedFiles) {
             if ((extension) == "." + supported) {
